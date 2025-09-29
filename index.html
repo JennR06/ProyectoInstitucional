@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Talento Humano - Liceo Militar de Honduras</title>
+  <!-- Hoja de estilos principal -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Script con defer para que se ejecute tras cargar el DOM -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <section id="login">
+    <div class="login-box">
+      <img src="img/logo-lmh.png"
+           alt="Liceo Militar de Honduras"
+           class="logo">
+      <h2>Talento Humano</h2>
+
+      <!-- Campos de usuario y contraseña -->
+      <input type="text" id="usuario" placeholder="Usuario">
+      <input type="password" id="clave" placeholder="Contraseña">
+
+      <!-- Botón que dispara la validación en script.js -->
+      <button type="button" onclick="validarLogin()">Entrar</button>
+
+      <!-- Mensaje de error -->
+      <p id="error" class="error"></p>
+    </div>
+  </section>
+
+  <!-- DASHBOARD (oculto hasta login exitoso) -->
+  <section id="dashboard">
+    <!-- Barra superior -->
+    <div class="navbar">
+      <img src="img/logo-lmh.png"
+           alt="Liceo Militar"
+           class="logo-navbar">
+      Sistema de Talento Humano - Liceo Militar de Honduras
+    </div>
+
+    <!-- Menú lateral -->
+    <aside class="sidebar">
+      <button type="button" onclick="mostrar('oficiales')">
+        Historial de Oficiales
+      </button>
+      <button type="button" onclick="mostrar('mantenimiento')">
+        Personal de Mantenimiento
+      </button>
+      <button type="button" onclick="mostrar('profesores')">
+        Profesores
+      </button>
+      <button type="button" onclick="mostrar('administrativo')">
+        Personal Administrativo
+      </button>
+      <button type="button" onclick="mostrar('reportes')">
+        Reportes
+      </button>
+      <button type="button" onclick="mostrar('notificaciones')">
+        Notificaciones
+      </button>
+      <button type="button" onclick="cerrarSesion()">
+        Cerrar Sesión
+      </button>
+    </aside>
+
+    <!-- Contenedor dinámico -->
+    <main class="content" id="contenido">
+      <h2>Bienvenidos</h2>
+      <p>Selecciona una opción del menú para ver la información.</p>
+    </main>
+  </section>
+
+</body>
+</html>
