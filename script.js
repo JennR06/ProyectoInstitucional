@@ -26,10 +26,6 @@ function validarLogin() {
     dashboard.style.display      = "block";
     dashboard.classList.add("active");
     // Restaurar contenido inicial
-    contenido.innerHTML = `
-      <h2>Bienvenido</h2>
-      <p>Selecciona una opción del menú para ver la información.</p>
-    `;
   } else {
     errorMsg.innerText = "Usuario o contraseña incorrectos";
   }
@@ -45,10 +41,6 @@ function cerrarSesion() {
   claveInput.value   = "";
   errorMsg.innerText = "";
 
-  contenido.innerHTML = `
-    <h2>Bienvenido</h2>
-    <p>Selecciona una opción del menú para ver la información.</p>
-  `;
 }
 
 // Mostrar la sección correspondiente en el main#contenido
@@ -111,10 +103,48 @@ function mostrar(seccion) {
         </ul>`;
       break;
 
-    default:
-      html = `
-        <h2>Bienvenido</h2>
-        <p>Selecciona una opción del menú para ver la información.</p>`;
+let usuarioActivo = ""; // Guarda el usuario que inició sesión
+
+function validarLogin() {
+  const user = usuarioInput.value.trim();
+  const pass = claveInput.value.trim();
+
+  if (usuariosVal[user] === pass) {
+    usuarioActivo = user; // Guarda el nombre del usuario
+    errorMsg.innerText = "";
+    loginSection.style.display   = "none";
+    dashboard.style.display      = "block";
+    dashboard.classList.add("active");
+
+    mostrarBienvenida(); // Muestra saludo personalizado
+  } else {
+    errorMsg.innerText = "Usuario o contraseña incorrectos";
+  }
+}
+
+function mostrarBienvenida() {
+  const saludo = usuarioActivo === "director"
+    ? "Bienvenido, Director"
+    : "Bienvenida, Talento Humano";
+
+  contenido.innerHTML = `
+    <div class="bienvenida">
+      <h2>🎖️ ${saludo}</h2>
+      <p class="intro">
+        Este sistema ha sido diseñado para fortalecer la gestión del personal del <strong>Liceo Militar de Honduras</strong>, promoviendo la excelencia, la disciplina y el compromiso institucional.
+      </p>
+      <blockquote class="frase-motivacional">
+        “La disciplina forma líderes, el talento los perfecciona.”
+      </blockquote>
+      <div class="info-box">
+        <p><strong>¿Qué puedes hacer aquí?</strong></p>
+        <ul>
+          <li>📁 Consultar historial de oficiales, docentes y personal administrativo</li>
+          <li>📊 Visualizar reportes y evaluaciones por año</li>
+          <li>🔔 Recibir notificaciones importantes</li>
+        </ul>
+  `;
+}
   }
 
   // Inyectar y animar

@@ -6,6 +6,8 @@
   <title>Sistema Talento Humano - Liceo Militar de Honduras</title>
   <!-- Hoja de estilos principal -->
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="index.php">
+  <link rel="stylesheet" href="bd.php">
 
   <!-- Script con defer para que se ejecute tras cargar el DOM -->
   <script src="script.js" defer></script>
@@ -51,7 +53,7 @@
         Personal de Mantenimiento
       </button>
       <button type="button" onclick="mostrar('profesores')">
-        Profesores
+        Docentes
       </button>
       <button type="button" onclick="mostrar('administrativo')">
         Personal Administrativo
@@ -68,11 +70,34 @@
     </aside>
 
     <!-- Contenedor dinámico -->
-    <main class="content" id="contenido">
-      <h2>Bienvenidos</h2>
-      <p>Selecciona una opción del menú para ver la información.</p>
-    </main>
-  </section>
+   <main class="content" id="contenido">
+  <div class="bienvenida">
+    <h2>🎖️ Bienvenidos al Sistema de Talento Humano</h2>
+    
+    <p class="intro">
+      Este sistema ha sido diseñado para fortalecer la gestión del personal del <strong>Liceo Militar de Honduras</strong>, 
+      promoviendo la excelencia, la disciplina y el compromiso institucional.
+    </p>
+
+    <blockquote class="frase-motivacional">
+      “La disciplina forma líderes, el talento los perfecciona.”
+    </blockquote>
+
+    <div class="info-box">
+      <p><strong>¿Qué puedes hacer aquí?</strong></p>
+      <ul>
+        <li>📁 Consultar historial de oficiales, docentes y personal administrativo</li>
+        <li>📊 Visualizar reportes y evaluaciones por año</li>
+        <li>🔔 Recibir notificaciones importantes</li>
+      </ul>
+    </div>
+
+    <p class="sugerencia">
+      👉 Usa el menú lateral para comenzar tu recorrido.
+    </p>
+  </div>
+</main>
+
 
 </body>
 </html>
