@@ -48,59 +48,19 @@ function mostrar(seccion) {
   let html = "";
 
   switch (seccion) {
-    case "oficiales":
-      html = `
-        <h2>Historial de Oficiales</h2>
-        <table>
-          <tr><th>Nombre</th><th>Rango</th><th>Años de Servicio</th></tr>
-          <tr><td>Cap. Juan Pérez</td><td>Capitán</td><td>12</td></tr>
-          <tr><td>Tte. María López</td><td>Teniente</td><td>8</td></tr>
-        </table>`;
-      break;
-
     case "mantenimiento":
-      html = `
-        <h2>Personal de Mantenimiento</h2>
-        <table>
-          <tr><th>Nombre</th><th>Área</th></tr>
-          <tr><td>Carlos Mejía</td><td>Jardinería</td></tr>
-          <tr><td>Ana Torres</td><td>Limpieza</td></tr>
-        </table>`;
       break;
 
     case "profesores":
-      html = `
-        <h2>Profesores</h2>
-        <table>
-          <tr><th>Nombre</th><th>Materia</th></tr>
-          <tr><td>José Martínez</td><td>Matemáticas</td></tr>
-          <tr><td>Laura Ramírez</td><td>Historia</td></tr>
-        </table>`;
       break;
 
     case "administrativo":
-      html = `
-        <h2>Personal Administrativo</h2>
-        <table>
-          <tr><th>Nombre</th><th>Puesto</th></tr>
-          <tr><td>Pedro Gómez</td><td>Secretario</td></tr>
-          <tr><td>Sofía Hernández</td><td>Recepcionista</td></tr>
-        </table>`;
       break;
 
     case "reportes":
-      html = `
-        <h2>Reportes</h2>
-        <p>Aquí se mostrarán los reportes de personal y actividades.</p>`;
       break;
 
     case "notificaciones":
-      html = `
-        <h2>Notificaciones</h2>
-        <ul>
-          <li>📢 Reunión de docentes el viernes.</li>
-          <li>📢 Inspección de limpieza el lunes.</li>
-        </ul>`;
       break;
 
 let usuarioActivo = ""; // Guarda el usuario que inició sesión
@@ -161,3 +121,165 @@ function mostrarBienvenida() {
   });
 });
 
+// Mostrar la sección de navbar
+function mostrar(seccion) {
+  if (seccion === "oficiales") {
+    // Cargar historial de oficiales por AJAX
+    fetch('historial_oficiales.php')
+      .then(res => res.text())
+      .then(html => {
+        contenido.innerHTML = html;
+        contenido.classList.remove("fade-in");
+        void contenido.offsetWidth;
+        contenido.classList.add("fade-in");
+      });
+  } else if (seccion === "mantenimiento") {
+    // Cargar personal de mantenimiento por AJAX
+    fetch('personal_manteminiento.php')
+      .then(res => res.text())
+      .then(html => {
+        contenido.innerHTML = html;
+        contenido.classList.remove("fade-in");
+        void contenido.offsetWidth;
+        contenido.classList.add("fade-in");
+      });
+  } else {
+    mostrarBienvenida();
+  }
+}
+
+// ...al final de script.js...
+
+// ----- Funciones para oficiales -----
+window.mostrarFormOficial = function() {
+  document.getElementById('formDivOficial').style.display = 'block';
+  document.getElementById('ofId').value = '';
+  document.getElementById('ofNombre').value = '';
+  document.getElementById('ofRango').value = '';
+  document.getElementById('ofaños_asignado').value = '';
+}
+
+window.cerrarFormOficial = function() {
+  document.getElementById('formDivOficial').style.display = 'none';
+}
+
+window.editarOficial = function(id, nombre, rango, anio) {
+  document.getElementById('formDivOficial').style.display = 'block';
+  document.getElementById('ofId').value = id;
+  document.getElementById('ofNombre').value = nombre;
+  document.getElementById('ofRango').value = rango;
+  document.getElementById('ofaños_asignado').value = anio;
+}
+
+window.eliminarOficial = function(id) {
+  if (!confirm('¿Eliminar este oficial?')) return;
+  const datos = new FormData();
+  datos.append('delete', id);
+  fetch('historial_oficiales.php', {
+    method: 'POST',
+    body: datos
+  })
+  .then(res => res.text())
+  .then(resp => {
+    recargarOficiales();
+  });
+}
+
+window.recargarOficiales = function() {
+  fetch('historial_oficiales.php')
+    .then(res => res.text())
+    .then(html => {
+      contenido.innerHTML = html;
+      contenido.classList.remove("fade-in");
+      void contenido.offsetWidth;
+      contenido.classList.add("fade-in");
+    });
+}
+
+// AJAX para guardar oficial
+document.addEventListener('submit', function(e) {
+  if (e.target && e.target.id === 'oficialForm') {
+    e.preventDefault();
+    const form = e.target;
+    const datos = new FormData(form);
+    datos.append('ajax', '1');
+    fetch('historial_oficiales.php', {
+      method: 'POST',
+      body: datos
+    })
+    .then(res => res.text())
+    .then(resp => {
+      cerrarFormOficial();
+      recargarOficiales();
+    });
+  }
+});
+
+// ----- Funciones para mantenimiento -----
+window.mostrarFormMantenimiento = function() {
+  document.getElementById('formDivMantenimiento').style.display = 'block';
+  document.getElementById('pmId').value = '';
+  document.getElementById('pmNombre').value = '';
+  document.getElementById('pmCargo').value = '';
+  document.getElementById('pmAñoIngreso').value = '';
+}
+
+window.cerrarFormMantenimiento = function() {
+  document.getElementById('formDivMantenimiento').style.display = 'none';
+}
+
+window.editarMantenimiento = function(id, nombre, cargo, anio) {
+  document.getElementById('formDivMantenimiento').style.display = 'block';
+  document.getElementById('pmId').value = id;
+  document.getElementById('pmNombre').value = nombre;
+  document.getElementById('pmCargo').value = cargo;
+  document.getElementById('pmAñoIngreso').value = anio;
+}
+
+window.eliminarMantenimiento = function(id) {
+  if (!confirm('¿Eliminar este personal?')) return;
+  const datos = new FormData();
+  datos.append('delete', id);
+  fetch('personal_manteminiento.php', {
+    method: 'POST',
+    body: datos
+  })
+  .then(res => res.text())
+  .then(resp => {
+    recargarMantenimiento();
+  });
+}
+
+window.recargarMantenimiento = function() {
+  fetch('personal_manteminiento.php')
+    .then(res => res.text())
+    .then(html => {
+      contenido.innerHTML = html;
+      contenido.classList.remove("fade-in");
+      void contenido.offsetWidth;
+      contenido.classList.add("fade-in");
+    });
+}
+
+// AJAX para guardar mantenimiento
+document.addEventListener('click', function(e) {
+  if (e.target.closest('#mantenimientoForm')) {
+    const form = document.getElementById('mantenimientoForm');
+    if (form) {
+      form.onsubmit = function(ev) {
+        ev.preventDefault();
+        const datos = new FormData(form);
+        datos.append('ajax', '1');
+        fetch('personal_manteminiento.php', {
+          method: 'POST',
+          body: datos
+        })
+        .then(res => res.text())
+        .then(resp => {
+          cerrarFormMantenimiento();
+          recargarMantenimiento();
+        });
+      };
+    }
+  }
+});
