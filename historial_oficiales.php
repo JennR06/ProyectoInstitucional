@@ -41,20 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   exit('OK');
 }
 
-  if ($id) {
-    $stmt = $pdo->prepare(
-      "UPDATE oficiales SET nombre = ?, rango = ?, años_asignado = ? WHERE id = ?"
-    );
-    $stmt->execute([$nombre, $rango, $anio, $id]);
-  } else {
-    $stmt = $pdo->prepare(
-      "INSERT INTO oficiales (nombre, rango, años_asignado) VALUES (?, ?, ?)"
-    );
-    $stmt->execute([$nombre, $rango, $anio]);
-  }
-  exit('OK');
-}
-
 // 2) Eliminar (AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
   $stmt = $pdo->prepare("DELETE FROM oficiales WHERE id = ?");

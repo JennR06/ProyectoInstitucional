@@ -59,7 +59,7 @@ $personal = $stmt->fetchAll();
   <?php foreach ($personal as $p): ?>
     <div class="perfil-card">
     <img 
-    src="<?= $p['foto'] ? htmlspecialchars($p['foto']) : 'img/default_user.png' ?>" 
+    src="<?= $p['foto'] ? htmlspecialchars($p['foto']) : '' ?>" 
     alt="Foto de <?= htmlspecialchars($p['nombre']) ?>" 
     class="perfil-foto"
     >
