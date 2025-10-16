@@ -1,26 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema Talento Humano - Liceo Militar de Honduras</title>
-  <!-- Hoja de estilos principal -->
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="index.php">
-  <link rel="stylesheet" href="bd.php">
-
 <?php
-// db.php
+// bd.php
 $host = 'localhost';
 $db   = 'talento_humano';
 $user = 'root';
-$pass = '';          // tu contraseña si aplica
+$pass = '';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 $options = [
   PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-  PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+  PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+  PDO::ATTR_EMULATE_PREPARES => false
 ];
 
-$pdo = new PDO($dsn, $user, $pass, $options);
+try {
+  $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (PDOException $e) {
+  die("Error de conexión: " . $e->getMessage());
+}
 ?>

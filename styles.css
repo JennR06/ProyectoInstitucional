@@ -1,20 +1,12 @@
-/*------------------------------------
-  VARIABLES GLOBALES
-------------------------------------*/
 :root {
-  --primary: #028000bf;
-  --primary-light: #0a8037;
-  --secondary: #028000bf; /*barra lateral*/
-  --accent: #cce0ff;
-  --error: #d9534f;
-  --overlay: rgba(255, 255, 255, 0.85);
-  --transition-fast: 0.3s ease-in-out;
-
+  --primary: #2d5016;
+  --primary-light: #4a7c2a;
+  --secondary: #1a3d0f;
+  --accent: #e8f5e9;
+  --error: #d32f2f;
+  --overlay: rgba(255, 255, 255, 0.95);
+  --transition-fast: 0.3s ease;
 }
-
-/*------------------------------------
-  RESET Y BASE
-------------------------------------*/
 *,
 *::before,
 *::after {
@@ -24,14 +16,12 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
-  min-height: 100vh;
   background: 
-    linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
-    url("../proyecto_institucionals/img/lmh_hn_cover.jpg") center/cover fixed no-repeat;
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), /* overlay más oscuro */
+    url("img/lmh_hn_cover.jpg") center/cover fixed no-repeat;
   color: #333;
-  overflow-x: hidden;
 }
+
 
 /*------------------------------------
   ANIMACIONES
@@ -247,45 +237,24 @@ body {
   margin-top: 1rem;
 }
 
+/* BOTONES */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+.btn-primario { background: var(--primary); color: #fff; }
+.btn-primario:hover { background: var(--primary-light); }
+.btn-secundario { background: #ddd; color: #333; }
+.btn-secundario:hover { background: #ccc; }
 
 
 .fade-in {
   animation: fadeIn 0.6s both;
 }
 
-/*ESTILO DE HISTORIAL DE OFICIALES CRUD*/
-/* Botones CRUD */
-.btn-primario {
-  background: var(--primary);
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-  align-items: center;
-}
-.btn-primario:hover {
-  background: var(--primary-light);
-}
-
-.btn-secundario {
-  background: #ddd;
-  color: #333;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-left: 0.5rem;
-}
-.btn-secundario:hover {
-  background: #ccc;
-}
-
-.btn-pequeno {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.9rem;
-}
 
 /* Formulario CRUD */
 .form-crud {
@@ -377,7 +346,98 @@ table {
   justify-content: center;
   margin-top: 2rem;
 }
+/* ========================================
+   ESTILOS MEJORADOS PARA PERFILES
+======================================== */
 
+.perfil-card-expandido {
+  max-width: 380px;
+  min-height: 450px;
+}
+
+.perfil-notas {
+  background: #f8f9fa;
+  border-left: 4px solid var(--primary);
+  padding: 0.8rem;
+  margin: 1rem 0;
+  border-radius: 6px;
+}
+
+.perfil-notas strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.perfil-notas p {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.perfil-documento {
+  margin: 1rem 0;
+}
+
+.btn-documento {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background: #0066cc;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.btn-documento:hover {
+  background: #0052a3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+/* ===FORMULARIO AMPLIADO=== */
+
+.modal-form-amplio {
+  max-width: 700px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 0.85rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+}
+
+/* Responsive para formulario ampliado */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-form-amplio {
+    max-width: 95%;
+  }
+}
 .perfil-card {
   background: #fff;
   border-radius: 12px;
@@ -417,6 +477,12 @@ table {
   display: block;
 }
 
+@media (max-width: 900px) {
+  .perfil-lista { flex-direction: column; align-items: center; }
+  .perfil-card { width: 90%; max-width: 300px; }
+}
+
+
 .titulo-centrado {
   text-align: center;
   margin-top: 3rem;
@@ -448,3 +514,430 @@ table {
   font-size: 1.1rem;
   padding: 0.6rem 1.4rem;
 }
+
+/* Modal overlay para formularios */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s;
+}
+
+.modal-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideInUp 0.3s;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para el encabezado del formulario modal */
+.modal-form h3 {
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.3rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-buttons button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+/* Responsive para formulario */
+@media (max-width: 600px) {
+  .modal-form {
+    padding: 1.5rem;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+}
+
+/* === MODAL OVERLAY MEJORADO === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s;
+}
+
+.modal-form {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+  max-width: 550px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideInUp 0.4s ease-out;
+  position: relative;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-form h3 {
+  color: var(--primary);
+  margin-bottom: 1.8rem;
+  text-align: center;
+  font-size: 1.6rem;
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 0.8rem;
+}
+
+.form-group {
+  margin-bottom: 1.3rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.85rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.4rem;
+  color: #666;
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.form-buttons button {
+  flex: 1;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.form-buttons .btn-primario:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(45, 80, 22, 0.3);
+}
+
+.form-buttons .btn-secundario:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .modal-form {
+    padding: 1.8rem;
+    width: 95%;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+  
+  .modal-form h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/*------------------DOCENTES------------------*/
+/* Estilos para select (dropdown) */
+.form-group select {
+  width: 100%;
+  padding: 0.85rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  box-sizing: border-box;
+  background-color: white;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+}
+
+.form-group select option {
+  padding: 0.5rem;
+}
+
+/*------------------NOTIFICACIONES------------------*/
+.notificaciones-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.notificacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 0.3s ease;
+  border-left: 4px solid var(--primary);
+}
+
+.notificacion:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.notificacion-info {
+  flex: 1;
+}
+
+.notificacion-info h4 {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  color: var(--primary);
+}
+
+.notificacion-info p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0.2rem;
+}
+
+.notificacion-info small {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.notificacion-acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.notificacion-acciones button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.notificacion-acciones button:hover {
+  color: var(--error);
+}
+
+
+/*------------------Reportes------------------*/
+.reporte-box table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #f5f5f5;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.reporte-box th {
+  background: var(--primary-light);
+  color: #fff;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.reporte-box td {
+  padding: 1rem;
+  color: #444;
+  border-bottom: 1px solid #ddd;
+}
+
+.reporte-box tr:hover {
+  background: #e8f5e9;
+}
+
+.tabla-grupo {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.bloque-titulo {
+  background: var(--primary);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+/* Contenedor de todas las tablas */
+#resultadoReporte {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Cada bloque de tabla */
+.tabla-grupo {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Título del grupo */
+.bloque-titulo {
+  background: var(--primary);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+/* Tabla interna */
+.tabla-grupo table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-grupo th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.tabla-grupo td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.tabla-grupo tr:hover {
+  background: var(--accent);
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  #resultadoReporte {
+    grid-template-columns: 1fr;
+  }
+}
+

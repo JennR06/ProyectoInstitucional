@@ -1,5 +1,3 @@
-// js/script.js
-
 // Referencias a elementos del DOM
 const loginSection   = document.getElementById("login");
 const dashboard      = document.getElementById("dashboard");
@@ -10,10 +8,12 @@ const contenido      = document.getElementById("contenido");
 
 // Usuarios y contraseñas válidos
 const usuariosVal = {
-  director: "1234",
+  rectoria: "1234",
   talento:  "abcd",
   admin:    "rinrom",
 };
+
+let usuarioActivo = '';
 
 // Validar credenciales y mostrar dashboard
 function validarLogin() {
@@ -21,11 +21,12 @@ function validarLogin() {
   const pass = claveInput.value.trim();
 
   if (usuariosVal[user] === pass) {
+    usuarioActivo = user;
     errorMsg.innerText = "";
-    loginSection.style.display   = "none";
-    dashboard.style.display      = "block";
+    loginSection.style.display = "none";
+    dashboard.style.display = "block";
     dashboard.classList.add("active");
-    // Restaurar contenido inicial
+    mostrarBienvenida();
   } else {
     errorMsg.innerText = "Usuario o contraseña incorrectos";
   }
@@ -34,54 +35,14 @@ function validarLogin() {
 // Cerrar sesión y volver al login
 function cerrarSesion() {
   dashboard.classList.remove("active");
-  dashboard.style.display    = "none";
+  dashboard.style.display = "none";
   loginSection.style.display = "flex";
-
   usuarioInput.value = "";
-  claveInput.value   = "";
+  claveInput.value = "";
   errorMsg.innerText = "";
-
 }
 
-// Mostrar la sección correspondiente en el main#contenido
-function mostrar(seccion) {
-  let html = "";
-
-  switch (seccion) {
-    case "mantenimiento":
-      break;
-
-    case "profesores":
-      break;
-
-    case "administrativo":
-      break;
-
-    case "reportes":
-      break;
-
-    case "notificaciones":
-      break;
-
-let usuarioActivo = ""; // Guarda el usuario que inició sesión
-
-function validarLogin() {
-  const user = usuarioInput.value.trim();
-  const pass = claveInput.value.trim();
-
-  if (usuariosVal[user] === pass) {
-    usuarioActivo = user; // Guarda el nombre del usuario
-    errorMsg.innerText = "";
-    loginSection.style.display   = "none";
-    dashboard.style.display      = "block";
-    dashboard.classList.add("active");
-
-    mostrarBienvenida(); // Muestra saludo personalizado
-  } else {
-    errorMsg.innerText = "Usuario o contraseña incorrectos";
-  }
-}
-
+// Mostrar pantalla de bienvenida
 function mostrarBienvenida() {
   const saludo = usuarioActivo === "director"
     ? "Bienvenido, Director"
@@ -91,10 +52,11 @@ function mostrarBienvenida() {
     <div class="bienvenida">
       <h2>🎖️ ${saludo}</h2>
       <p class="intro">
-        Este sistema ha sido diseñado para fortalecer la gestión del personal del <strong>Liceo Militar de Honduras</strong>, promoviendo la excelencia, la disciplina y el compromiso institucional.
+        Este sistema ha sido diseñado para fortalecer la gestión del personal del <strong>Liceo Militar de Honduras</strong>, 
+        promoviendo la excelencia, la disciplina y el compromiso institucional.
       </p>
       <blockquote class="frase-motivacional">
-        “La disciplina forma líderes, el talento los perfecciona.”
+        "La disciplina forma líderes, el talento los perfecciona."
       </blockquote>
       <div class="info-box">
         <p><strong>¿Qué puedes hacer aquí?</strong></p>
@@ -103,15 +65,12 @@ function mostrarBienvenida() {
           <li>📊 Visualizar reportes y evaluaciones por año</li>
           <li>🔔 Recibir notificaciones importantes</li>
         </ul>
+      </div>
+      <p class="sugerencia">
+        👉 Usa el menú lateral para comenzar tu recorrido.
+      </p>
+    </div>
   `;
-}
-  }
-
-  // Inyectar y animar
-  contenido.innerHTML = html;
-  contenido.classList.remove("fade-in");
-  void contenido.offsetWidth;              // fuerza reflow
-  contenido.classList.add("fade-in");
 }
 
 // Disparar login con la tecla Enter
@@ -124,7 +83,6 @@ function mostrarBienvenida() {
 // Mostrar la sección de navbar
 function mostrar(seccion) {
   if (seccion === "oficiales") {
-    // Cargar historial de oficiales por AJAX
     fetch('historial_oficiales.php')
       .then(res => res.text())
       .then(html => {
@@ -132,56 +90,126 @@ function mostrar(seccion) {
         contenido.classList.remove("fade-in");
         void contenido.offsetWidth;
         contenido.classList.add("fade-in");
-      });
+        inicializarEventosOficiales();
+      })
+      .catch(err => console.error('Error cargando oficiales:', err));
   } else if (seccion === "mantenimiento") {
-    // Cargar personal de mantenimiento por AJAX
-    fetch('personal_manteminiento.php')
+    fetch('personal_mantenimiento.php')
       .then(res => res.text())
       .then(html => {
         contenido.innerHTML = html;
         contenido.classList.remove("fade-in");
         void contenido.offsetWidth;
         contenido.classList.add("fade-in");
-      });
+        inicializarEventosMantenimiento();
+      })
+      .catch(err => console.error('Error cargando mantenimiento:', err));
+  } else if (seccion === "profesores") { 
+    fetch('docentes.php')
+      .then(res => res.text())
+      .then(html => {
+        contenido.innerHTML = html;
+        contenido.classList.remove("fade-in");
+        void contenido.offsetWidth;
+        contenido.classList.add("fade-in");
+        inicializarEventosDocentes();
+      })
+      .catch(err => console.error('Error cargando docentes:', err));
+  } else if (seccion === "administrativo") { 
+    fetch('personal_administrativo.php')
+      .then(res => res.text())
+      .then(html => {
+        contenido.innerHTML = html;
+        contenido.classList.remove("fade-in");
+        void contenido.offsetWidth;
+        contenido.classList.add("fade-in");
+        inicializarEventosAdministrativo();
+      })
+      .catch(err => console.error('Error cargando administrativo:', err));
+  } else if (seccion === "notificaciones") {
+    fetch('notificaciones.php')
+      .then(res => res.text())
+      .then(html => {
+        contenido.innerHTML = html;
+        contenido.classList.remove("fade-in");
+        void contenido.offsetWidth;
+        contenido.classList.add("fade-in");
+        inicializarEventosNotificaciones();
+      })
+      .catch(err => console.error('Error cargando notificaciones:', err));
+  } else if (seccion === "reportes") {
+    fetch('reportes.php')
+      .then(res => res.text())
+      .then(html => {
+        contenido.innerHTML = html;
+        contenido.classList.remove("fade-in");
+        void contenido.offsetWidth;
+        contenido.classList.add("fade-in");
+        inicializarEventosReportes();
+      })
+      .catch(err => console.error('Error cargando reportes:', err));
   } else {
     mostrarBienvenida();
   }
 }
 
-// ...al final de script.js...
+// ========================================
+// FUNCIONES PARA OFICIALES (ACTUALIZADO)
+// ========================================
 
-// ----- Funciones para oficiales -----
 window.mostrarFormOficial = function() {
-  document.getElementById('formDivOficial').style.display = 'block';
-  document.getElementById('ofId').value = '';
-  document.getElementById('ofNombre').value = '';
-  document.getElementById('ofRango').value = '';
-  document.getElementById('ofaños_asignado').value = '';
+  const modal = document.getElementById('formDivOficial');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('ofId').value = '';
+    document.getElementById('ofNombre').value = '';
+    document.getElementById('ofRango').value = '';
+    document.getElementById('ofAniosAsignado').value = '';
+    document.getElementById('ofSalario').value = ''; // ✅ NUEVO
+    document.getElementById('ofNotas').value = '';   // ✅ NUEVO
+    document.getElementById('ofFoto').value = '';
+    document.getElementById('ofDocumento').value = ''; // ✅ NUEVO
+  }
 }
 
 window.cerrarFormOficial = function() {
-  document.getElementById('formDivOficial').style.display = 'none';
+  const modal = document.getElementById('formDivOficial');
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
-window.editarOficial = function(id, nombre, rango, anio) {
-  document.getElementById('formDivOficial').style.display = 'block';
-  document.getElementById('ofId').value = id;
-  document.getElementById('ofNombre').value = nombre;
-  document.getElementById('ofRango').value = rango;
-  document.getElementById('ofaños_asignado').value = anio;
+window.editarOficial = function(datos) {
+  const modal = document.getElementById('formDivOficial');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('ofId').value = datos.id;
+    document.getElementById('ofNombre').value = datos.nombre;
+    document.getElementById('ofRango').value = datos.rango;
+    document.getElementById('ofAniosAsignado').value = datos.anio;
+    document.getElementById('ofSalario').value = datos.salario || 0; // ✅ NUEVO
+    document.getElementById('ofNotas').value = datos.notas || '';    // ✅ NUEVO
+  }
 }
 
 window.eliminarOficial = function(id) {
-  if (!confirm('¿Eliminar este oficial?')) return;
+  if (!confirm('¿Está seguro de eliminar este oficial?\n\nEsto también eliminará sus archivos asociados.')) return;
+  
   const datos = new FormData();
   datos.append('delete', id);
+  
   fetch('historial_oficiales.php', {
     method: 'POST',
     body: datos
   })
   .then(res => res.text())
   .then(resp => {
+    alert('✅ Oficial eliminado correctamente');
     recargarOficiales();
+  })
+  .catch(err => {
+    console.error('Error:', err);
+    alert('❌ Error al eliminar');
   });
 }
 
@@ -193,93 +221,501 @@ window.recargarOficiales = function() {
       contenido.classList.remove("fade-in");
       void contenido.offsetWidth;
       contenido.classList.add("fade-in");
+      inicializarEventosOficiales();
     });
 }
 
-// AJAX para guardar oficial
-document.addEventListener('submit', function(e) {
-  if (e.target && e.target.id === 'oficialForm') {
-    e.preventDefault();
-    const form = e.target;
-    const datos = new FormData(form);
-    datos.append('ajax', '1');
-    fetch('historial_oficiales.php', {
-      method: 'POST',
-      body: datos
-    })
-    .then(res => res.text())
-    .then(resp => {
-      cerrarFormOficial();
-      recargarOficiales();
-    });
+function inicializarEventosOficiales() {
+  const form = document.getElementById('oficialForm');
+  if (form) {
+    form.onsubmit = null;
+    
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      
+      console.log('Formulario de oficial enviado');
+      
+      const datos = new FormData(form);
+      datos.append('ajax', '1');
+      
+      // Validar salario
+      const salario = parseFloat(datos.get('salario'));
+      if (isNaN(salario) || salario < 0) {
+        alert('⚠️ Por favor ingrese un salario válido');
+        return false;
+      }
+      
+      fetch('historial_oficiales.php', {
+        method: 'POST',
+        body: datos
+      })
+      .then(res => res.text())
+      .then(resp => {
+        console.log('Respuesta del servidor:', resp);
+        
+        if (resp.trim() === 'OK') {
+          alert('✅ Oficial guardado correctamente');
+          cerrarFormOficial();
+          recargarOficiales();
+        } else {
+          alert('⚠️ Error: ' + resp);
+        }
+      })
+      .catch(err => {
+        console.error('Error en fetch:', err);
+        alert('❌ Error de conexión');
+      });
+      
+      return false;
+    };
   }
-});
+}
 
-// ----- Funciones para mantenimiento -----
+// ========================================
+// FUNCIONES PARA MANTENIMIENTO (ACTUALIZADO)
+// ========================================
+
 window.mostrarFormMantenimiento = function() {
-  document.getElementById('formDivMantenimiento').style.display = 'block';
-  document.getElementById('pmId').value = '';
-  document.getElementById('pmNombre').value = '';
-  document.getElementById('pmCargo').value = '';
-  document.getElementById('pmAñoIngreso').value = '';
+  const modal = document.getElementById('formDivMantenimiento');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('pmId').value = '';
+    document.getElementById('pmNombre').value = '';
+    document.getElementById('pmCargo').value = '';
+    document.getElementById('pmAnioIngreso').value = '';
+    document.getElementById('pmSalario').value = '';
+    document.getElementById('pmNotas').value = '';
+    document.getElementById('pmFoto').value = '';
+    document.getElementById('pmDocumento').value = '';
+  }
 }
 
 window.cerrarFormMantenimiento = function() {
-  document.getElementById('formDivMantenimiento').style.display = 'none';
+  const modal = document.getElementById('formDivMantenimiento');
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
-window.editarMantenimiento = function(id, nombre, cargo, anio) {
-  document.getElementById('formDivMantenimiento').style.display = 'block';
-  document.getElementById('pmId').value = id;
-  document.getElementById('pmNombre').value = nombre;
-  document.getElementById('pmCargo').value = cargo;
-  document.getElementById('pmAñoIngreso').value = anio;
+window.editarMantenimiento = function(datos) {
+  const modal = document.getElementById('formDivMantenimiento');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('pmId').value = datos.id;
+    document.getElementById('pmNombre').value = datos.nombre;
+    document.getElementById('pmCargo').value = datos.cargo;
+    document.getElementById('pmAnioIngreso').value = datos.anio;
+    document.getElementById('pmSalario').value = datos.salario || 0;
+    document.getElementById('pmNotas').value = datos.notas || '';
+  }
 }
 
 window.eliminarMantenimiento = function(id) {
-  if (!confirm('¿Eliminar este personal?')) return;
+  if (!confirm('¿Está seguro de eliminar este personal?\n\nEsto también eliminará sus archivos asociados.')) return;
+  
   const datos = new FormData();
   datos.append('delete', id);
-  fetch('personal_manteminiento.php', {
+  
+  fetch('personal_mantenimiento.php', {
     method: 'POST',
     body: datos
   })
   .then(res => res.text())
   .then(resp => {
+    alert('✅ Personal eliminado correctamente');
     recargarMantenimiento();
+  })
+  .catch(err => {
+    console.error('Error:', err);
+    alert('❌ Error al eliminar');
   });
 }
 
 window.recargarMantenimiento = function() {
-  fetch('personal_manteminiento.php')
+  fetch('personal_mantenimiento.php')
     .then(res => res.text())
     .then(html => {
       contenido.innerHTML = html;
       contenido.classList.remove("fade-in");
       void contenido.offsetWidth;
       contenido.classList.add("fade-in");
+      inicializarEventosMantenimiento();
     });
 }
 
-// AJAX para guardar mantenimiento
-document.addEventListener('click', function(e) {
-  if (e.target.closest('#mantenimientoForm')) {
-    const form = document.getElementById('mantenimientoForm');
-    if (form) {
-      form.onsubmit = function(ev) {
-        ev.preventDefault();
-        const datos = new FormData(form);
-        datos.append('ajax', '1');
-        fetch('personal_manteminiento.php', {
-          method: 'POST',
-          body: datos
-        })
-        .then(res => res.text())
-        .then(resp => {
+function inicializarEventosMantenimiento() {
+  const form = document.getElementById('mantenimientoForm');
+  if (form) {
+    form.onsubmit = null;
+    
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      
+      console.log('Formulario de mantenimiento enviado');
+      
+      const datos = new FormData(form);
+      datos.append('ajax', '1');
+      
+      // Validar salario
+      const salario = parseFloat(datos.get('salario'));
+      if (isNaN(salario) || salario < 0) {
+        alert('⚠️ Por favor ingrese un salario válido');
+        return false;
+      }
+      
+      fetch('personal_mantenimiento.php', {
+        method: 'POST',
+        body: datos
+      })
+      .then(res => res.text())
+      .then(resp => {
+        console.log('Respuesta del servidor:', resp);
+        
+        if (resp.trim() === 'OK') {
+          alert('✅ Personal guardado correctamente');
           cerrarFormMantenimiento();
           recargarMantenimiento();
-        });
-      };
-    }
+        } else {
+          alert('⚠️ Error: ' + resp);
+        }
+      })
+      .catch(err => {
+        console.error('Error en fetch:', err);
+        alert('❌ Error de conexión');
+      });
+      
+      return false;
+    };
   }
-});
+}
+
+// ========================================
+// FUNCIONES PARA DOCENTES
+// ========================================
+
+window.mostrarFormDocente = function() {
+  const modal = document.getElementById('formDivDocente');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('docId').value = '';
+    document.getElementById('docNombre').value = '';
+    document.getElementById('docEspecialidad').value = '';
+    document.getElementById('docAnioIngreso').value = '';
+    document.getElementById('docSalario').value = '';
+    document.getElementById('docNotas').value = '';
+    document.getElementById('docNivelEducativo').value = '';
+    document.getElementById('docHorario').value = '';
+    document.getElementById('docFoto').value = '';
+    document.getElementById('docDocumento').value = '';
+  }
+}
+
+window.cerrarFormDocente = function() {
+  const modal = document.getElementById('formDivDocente');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+window.editarDocente = function(datos) {
+  const modal = document.getElementById('formDivDocente');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('docId').value = datos.id;
+    document.getElementById('docNombre').value = datos.nombre;
+    document.getElementById('docEspecialidad').value = datos.especialidad;
+    document.getElementById('docAnioIngreso').value = datos.anio;
+    document.getElementById('docSalario').value = datos.salario || 0;
+    document.getElementById('docNotas').value = datos.notas || '';
+    document.getElementById('docNivelEducativo').value = datos.nivel_educativo || '';
+    document.getElementById('docHorario').value = datos.horario || '';
+  }
+}
+
+window.eliminarDocente = function(id) {
+  if (!confirm('¿Está seguro de eliminar este docente?\n\nEsto también eliminará sus archivos asociados.')) return;
+  
+  const datos = new FormData();
+  datos.append('delete', id);
+  
+  fetch('docentes.php', {
+    method: 'POST',
+    body: datos
+  })
+  .then(res => res.text())
+  .then(resp => {
+    alert('✅ Docente eliminado correctamente');
+    recargarDocentes();
+  })
+  .catch(err => {
+    console.error('Error:', err);
+    alert('❌ Error al eliminar');
+  });
+}
+
+window.recargarDocentes = function() {
+  fetch('docentes.php')
+    .then(res => res.text())
+    .then(html => {
+      contenido.innerHTML = html;
+      contenido.classList.remove("fade-in");
+      void contenido.offsetWidth;
+      contenido.classList.add("fade-in");
+      inicializarEventosDocentes();
+    });
+}
+
+function inicializarEventosDocentes() {
+  const form = document.getElementById('docenteForm');
+  if (form) {
+    form.onsubmit = null;
+    
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      
+      console.log('Formulario de docente enviado');
+      
+      const datos = new FormData(form);
+      datos.append('ajax', '1');
+      
+      // Validar salario
+      const salario = parseFloat(datos.get('salario'));
+      if (isNaN(salario) || salario < 0) {
+        alert('⚠️ Por favor ingrese un salario válido');
+        return false;
+      }
+      
+      fetch('docentes.php', {
+        method: 'POST',
+        body: datos
+      })
+      .then(res => res.text())
+      .then(resp => {
+        console.log('Respuesta del servidor:', resp);
+        
+        if (resp.trim() === 'OK') {
+          alert('✅ Docente guardado correctamente');
+          cerrarFormDocente();
+          recargarDocentes();
+        } else {
+          alert('⚠️ Error: ' + resp);
+        }
+      })
+      .catch(err => {
+        console.error('Error en fetch:', err);
+        alert('❌ Error de conexión');
+      });
+      
+      return false;
+    };
+  }
+}
+
+// ========================================
+// FUNCIONES PARA ADMINISTRATIVO
+// ========================================
+
+window.mostrarFormAdministrativo = function() {
+  const modal = document.getElementById('formDivAdministrativo');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('pmId').value = '';
+    document.getElementById('pmNombre').value = '';
+    document.getElementById('pmCargo').value = '';
+    document.getElementById('pmAnioIngreso').value = '';
+    document.getElementById('pmSalario').value = '';
+    document.getElementById('pmNotas').value = '';
+    document.getElementById('pmFoto').value = '';
+    document.getElementById('pmDocumento').value = '';
+  }
+}
+
+window.cerrarFormAdministrativo = function() {
+  const modal = document.getElementById('formDivAdministrativo');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+window.editarAdministrativo = function(datos) {
+  const modal = document.getElementById('formDivAdministrativo');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('pmId').value = datos.id;
+    document.getElementById('pmNombre').value = datos.nombre;
+    document.getElementById('pmCargo').value = datos.cargo;
+    document.getElementById('pmAnioIngreso').value = datos.anio;
+    document.getElementById('pmSalario').value = datos.salario || 0;
+    document.getElementById('pmNotas').value = datos.notas || '';
+  }
+}
+
+window.eliminarAdministrativo = function(id) {
+  if (!confirm('¿Está seguro de eliminar este personal?\n\nEsto también eliminará sus archivos asociados.')) return;
+  
+  const datos = new FormData();
+  datos.append('delete', id);
+
+  fetch('personal_administrativo.php', {
+    method: 'POST',
+    body: datos
+  })
+  .then(res => res.text())
+  .then(resp => {
+    alert('✅ Personal eliminado correctamente');
+    recargarAdministrativo();
+  })
+  .catch(err => {
+    console.error('Error:', err);
+    alert('❌ Error al eliminar');
+  });
+}
+
+window.recargarAdministrativo = function() {
+  fetch('personal_administrativo.php')
+    .then(res => res.text())
+    .then(html => {
+      contenido.innerHTML = html;
+      contenido.classList.remove("fade-in");
+      void contenido.offsetWidth;
+      contenido.classList.add("fade-in");
+      inicializarEventosAdministrativo();
+    });
+}
+
+function inicializarEventosAdministrativo() {
+  const form = document.getElementById('administrativoForm');
+  if (form) {
+    form.onsubmit = null;
+    
+    form.onsubmit = function(e) {
+      e.preventDefault();
+
+      console.log('Formulario de Administrativo enviado');
+
+      const datos = new FormData(form);
+      datos.append('ajax', '1');
+      
+      // Validar salario
+      const salario = parseFloat(datos.get('salario'));
+      if (isNaN(salario) || salario < 0) {
+        alert('⚠️ Por favor ingrese un salario válido');
+        return false;
+      }
+      
+      fetch('personal_administrativo.php', {
+        method: 'POST',
+        body: datos
+      })
+      .then(res => res.text())
+      .then(resp => {
+        console.log('Respuesta del servidor:', resp);
+        
+        if (resp.trim() === 'OK') {
+          alert('✅ Personal guardado correctamente');
+          cerrarFormAdministrativo();
+          recargarAdministrativo();
+        } else {
+          alert('⚠️ Error: ' + resp);
+        }
+      })
+      .catch(err => {
+        console.error('Error en fetch:', err);
+        alert('❌ Error de conexión');
+      });
+      
+      return false;
+    };
+  }
+}
+
+// ========================================
+// FUNCIONES PARA NOOTIFICACIONES
+// ========================================
+window.mostrarFormNotificacion = function() {
+  document.getElementById('formDivNotificacion').style.display = 'flex';
+};
+
+window.cerrarFormNotificacion = function() {
+  document.getElementById('formDivNotificacion').style.display = 'none';
+};
+
+window.eliminarNotificacion = function(id) {
+  if (!confirm('¿Eliminar esta notificación?')) return;
+  const datos = new FormData();
+  datos.append('delete', id);
+
+  fetch('notificaciones.php', {
+    method: 'POST',
+    body: datos
+  })
+  .then(res => res.text())
+  .then(resp => {
+    alert('✅ Eliminada');
+    mostrar('notificaciones');
+  });
+};
+
+function inicializarEventosNotificaciones() {
+  const form = document.getElementById('notificacionForm');
+  if (form) {
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      const datos = new FormData(form);
+      datos.append('ajax', '1');
+
+      fetch('notificaciones.php', {
+        method: 'POST',
+        body: datos
+      })
+      .then(res => res.text())
+      .then(resp => {
+        if (resp.trim() === 'OK') {
+          alert('✅ Notificación guardada');
+          cerrarFormNotificacion();
+          mostrar('notificaciones');
+        } else {
+          alert('⚠️ Error: ' + resp);
+        }
+      });
+    };
+  }
+}
+
+// ========================================
+// FUNCIONES PARA REPORTES
+// ========================================
+function inicializarEventosReportes() {
+  const form = document.getElementById('formReporte');
+  if (form) {
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      const datos = new FormData(form);
+
+      fetch('reportes.php', {
+        method: 'POST',
+        body: datos
+      })
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('contenido').innerHTML = html;
+        inicializarEventosReportes(); // Reasigna eventos tras recarga
+      })
+      .catch(err => {
+        console.error('Error en reporte:', err);
+        alert('❌ Error al generar el reporte');
+      });
+    };
+  }
+}
+function recargarReportes() {
+  fetch('reportes.php')
+    .then(res => res.text())
+    .then(html => {
+      contenido.innerHTML = html; 
+      contenido.classList.remove("fade-in");
+      void contenido.offsetWidth;
+      contenido.classList.add("fade-in");
+      inicializarEventosReportes();
+    }); 
+}

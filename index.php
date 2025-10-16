@@ -6,8 +6,6 @@
   <title>Sistema Talento Humano - Liceo Militar de Honduras</title>
   <!-- Hoja de estilos principal -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="index.php">
-  <link rel="stylesheet" href="bd.php">
 
   <!-- Script con defer para que se ejecute tras cargar el DOM -->
   <script src="script.js" defer></script>
