@@ -45,8 +45,8 @@ function cerrarSesion() {
 // Mostrar pantalla de bienvenida
 function mostrarBienvenida() {
   const saludo = usuarioActivo === "director"
-    ? "Bienvenido, Director"
-    : "Bienvenida, Talento Humano";
+    ? "Bienvenido al Sistema INTEGRA"
+    : "Bienvenido al Sistema INTEGRA";
 
   contenido.innerHTML = `
     <div class="bienvenida">
@@ -61,14 +61,11 @@ function mostrarBienvenida() {
       <div class="info-box">
         <p><strong>¿Qué puedes hacer aquí?</strong></p>
         <ul>
-          <li>📁 Consultar historial de oficiales, docentes y personal administrativo</li>
-          <li>📊 Visualizar reportes y evaluaciones por año</li>
-          <li>🔔 Recibir notificaciones importantes</li>
-        </ul>
+        <li> -  Consultar historial del personal</li>
+        <li> -  Visualizar reportes</li>
+        <li> -  Recibir notificaciones importantes</li>
+      </ul>
       </div>
-      <p class="sugerencia">
-        👉 Usa el menú lateral para comenzar tu recorrido.
-      </p>
     </div>
   `;
 }
@@ -126,28 +123,16 @@ function mostrar(seccion) {
         inicializarEventosAdministrativo();
       })
       .catch(err => console.error('Error cargando administrativo:', err));
-  } else if (seccion === "notificaciones") {
-    fetch('notificaciones.php')
-      .then(res => res.text())
-      .then(html => {
-        contenido.innerHTML = html;
-        contenido.classList.remove("fade-in");
-        void contenido.offsetWidth;
-        contenido.classList.add("fade-in");
-        inicializarEventosNotificaciones();
-      })
-      .catch(err => console.error('Error cargando notificaciones:', err));
   } else if (seccion === "reportes") {
-    fetch('reportes.php')
+    fetch('dashboard.php')
       .then(res => res.text())
       .then(html => {
         contenido.innerHTML = html;
         contenido.classList.remove("fade-in");
         void contenido.offsetWidth;
         contenido.classList.add("fade-in");
-        inicializarEventosReportes();
       })
-      .catch(err => console.error('Error cargando reportes:', err));
+      .catch(err => console.error('Error cargando dashboard:', err)); 
   } else {
     mostrarBienvenida();
   }
@@ -165,10 +150,9 @@ window.mostrarFormOficial = function() {
     document.getElementById('ofNombre').value = '';
     document.getElementById('ofRango').value = '';
     document.getElementById('ofAniosAsignado').value = '';
-    document.getElementById('ofSalario').value = ''; // ✅ NUEVO
-    document.getElementById('ofNotas').value = '';   // ✅ NUEVO
+    document.getElementById('ofNotas').value = '';
     document.getElementById('ofFoto').value = '';
-    document.getElementById('ofDocumento').value = ''; // ✅ NUEVO
+    document.getElementById('ofDocumento').value = '';
   }
 }
 
@@ -187,8 +171,7 @@ window.editarOficial = function(datos) {
     document.getElementById('ofNombre').value = datos.nombre;
     document.getElementById('ofRango').value = datos.rango;
     document.getElementById('ofAniosAsignado').value = datos.anio;
-    document.getElementById('ofSalario').value = datos.salario || 0; // ✅ NUEVO
-    document.getElementById('ofNotas').value = datos.notas || '';    // ✅ NUEVO
+    document.getElementById('ofNotas').value = datos.notas || '';
   }
 }
 
@@ -238,13 +221,6 @@ function inicializarEventosOficiales() {
       const datos = new FormData(form);
       datos.append('ajax', '1');
       
-      // Validar salario
-      const salario = parseFloat(datos.get('salario'));
-      if (isNaN(salario) || salario < 0) {
-        alert('⚠️ Por favor ingrese un salario válido');
-        return false;
-      }
-      
       fetch('historial_oficiales.php', {
         method: 'POST',
         body: datos
@@ -252,7 +228,6 @@ function inicializarEventosOficiales() {
       .then(res => res.text())
       .then(resp => {
         console.log('Respuesta del servidor:', resp);
-        
         if (resp.trim() === 'OK') {
           alert('✅ Oficial guardado correctamente');
           cerrarFormOficial();
@@ -283,7 +258,6 @@ window.mostrarFormMantenimiento = function() {
     document.getElementById('pmNombre').value = '';
     document.getElementById('pmCargo').value = '';
     document.getElementById('pmAnioIngreso').value = '';
-    document.getElementById('pmSalario').value = '';
     document.getElementById('pmNotas').value = '';
     document.getElementById('pmFoto').value = '';
     document.getElementById('pmDocumento').value = '';
@@ -305,7 +279,6 @@ window.editarMantenimiento = function(datos) {
     document.getElementById('pmNombre').value = datos.nombre;
     document.getElementById('pmCargo').value = datos.cargo;
     document.getElementById('pmAnioIngreso').value = datos.anio;
-    document.getElementById('pmSalario').value = datos.salario || 0;
     document.getElementById('pmNotas').value = datos.notas || '';
   }
 }
@@ -356,13 +329,6 @@ function inicializarEventosMantenimiento() {
       const datos = new FormData(form);
       datos.append('ajax', '1');
       
-      // Validar salario
-      const salario = parseFloat(datos.get('salario'));
-      if (isNaN(salario) || salario < 0) {
-        alert('⚠️ Por favor ingrese un salario válido');
-        return false;
-      }
-      
       fetch('personal_mantenimiento.php', {
         method: 'POST',
         body: datos
@@ -401,7 +367,6 @@ window.mostrarFormDocente = function() {
     document.getElementById('docNombre').value = '';
     document.getElementById('docEspecialidad').value = '';
     document.getElementById('docAnioIngreso').value = '';
-    document.getElementById('docSalario').value = '';
     document.getElementById('docNotas').value = '';
     document.getElementById('docNivelEducativo').value = '';
     document.getElementById('docHorario').value = '';
@@ -425,7 +390,6 @@ window.editarDocente = function(datos) {
     document.getElementById('docNombre').value = datos.nombre;
     document.getElementById('docEspecialidad').value = datos.especialidad;
     document.getElementById('docAnioIngreso').value = datos.anio;
-    document.getElementById('docSalario').value = datos.salario || 0;
     document.getElementById('docNotas').value = datos.notas || '';
     document.getElementById('docNivelEducativo').value = datos.nivel_educativo || '';
     document.getElementById('docHorario').value = datos.horario || '';
@@ -478,13 +442,6 @@ function inicializarEventosDocentes() {
       const datos = new FormData(form);
       datos.append('ajax', '1');
       
-      // Validar salario
-      const salario = parseFloat(datos.get('salario'));
-      if (isNaN(salario) || salario < 0) {
-        alert('⚠️ Por favor ingrese un salario válido');
-        return false;
-      }
-      
       fetch('docentes.php', {
         method: 'POST',
         body: datos
@@ -523,7 +480,6 @@ window.mostrarFormAdministrativo = function() {
     document.getElementById('pmNombre').value = '';
     document.getElementById('pmCargo').value = '';
     document.getElementById('pmAnioIngreso').value = '';
-    document.getElementById('pmSalario').value = '';
     document.getElementById('pmNotas').value = '';
     document.getElementById('pmFoto').value = '';
     document.getElementById('pmDocumento').value = '';
@@ -545,7 +501,6 @@ window.editarAdministrativo = function(datos) {
     document.getElementById('pmNombre').value = datos.nombre;
     document.getElementById('pmCargo').value = datos.cargo;
     document.getElementById('pmAnioIngreso').value = datos.anio;
-    document.getElementById('pmSalario').value = datos.salario || 0;
     document.getElementById('pmNotas').value = datos.notas || '';
   }
 }
@@ -596,13 +551,6 @@ function inicializarEventosAdministrativo() {
       const datos = new FormData(form);
       datos.append('ajax', '1');
       
-      // Validar salario
-      const salario = parseFloat(datos.get('salario'));
-      if (isNaN(salario) || salario < 0) {
-        alert('⚠️ Por favor ingrese un salario válido');
-        return false;
-      }
-      
       fetch('personal_administrativo.php', {
         method: 'POST',
         body: datos
@@ -629,9 +577,10 @@ function inicializarEventosAdministrativo() {
   }
 }
 
-// ========================================
+
 // FUNCIONES PARA NOOTIFICACIONES
-// ========================================
+
+
 window.mostrarFormNotificacion = function() {
   document.getElementById('formDivNotificacion').style.display = 'flex';
 };
@@ -718,4 +667,76 @@ function recargarReportes() {
       contenido.classList.add("fade-in");
       inicializarEventosReportes();
     }); 
+}
+
+// Opción A — redirigir / recargar la página principal
+// Reemplazamos por comportamiento SPA: mostrar la bienvenida sin recargar
+window.Inicio = function() {
+  // Asegurar que el dashboard esté visible
+  if (loginSection) loginSection.style.display = 'none';
+  if (dashboard) {
+    dashboard.style.display = 'block';
+    dashboard.classList.add('active');
+  }
+
+  // Mostrar contenido de bienvenida y animar
+  mostrarBienvenida();
+
+  if (contenido) {
+    contenido.classList.remove('fade-in');
+    void contenido.offsetWidth; // reflow para reiniciar animación
+    contenido.classList.add('fade-in');
+    contenido.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+// ...existing code...
+
+function imprimirDocumento(url) {
+  if (!url) return alert('Documento no disponible');
+  // usar el endpoint intermedio que muestra el PDF y lanza print()
+  const win = window.open('print.php?f=' + encodeURIComponent(url), '_blank');
+  if (!win) {
+    alert('Ventanas emergentes bloqueadas. Permite popups para imprimir.');
+  }
+}
+
+
+// En tu archivo JavaScript o dentro de <script> tags en dashboard.php
+function exportToPDF() {
+    // Mostrar loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Generando...';
+    btn.disabled = true;
+    
+    // Abrir en nueva pestaña o descargar
+    window.open('export_pdf.php', '_blank');
+    
+    // Restaurar botón después de 2 segundos
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 2000);
+}
+
+function exportToExcel() {
+    // Mostrar loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Generando...';
+    btn.disabled = true;
+    
+    // Forzar descarga
+    const link = document.createElement('a');
+    link.href = 'export_excel.php';
+    link.download = 'reporte_dashboard_' + new Date().toISOString().split('T')[0] + '.xls';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Restaurar botón después de 2 segundos
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 2000);
 }

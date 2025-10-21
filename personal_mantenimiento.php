@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   $nombre  = trim($_POST['nombre']);
   $cargo   = trim($_POST['cargo']);
   $anio    = intval($_POST['anio_ingreso']);
-  $salario = floatval($_POST['salario']);
   $notas   = trim($_POST['notas']);
 
   // Manejo de imagen de perfil
@@ -57,34 +56,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   }
 
   if ($id) {
-    // Actualizar registro existente
+    // Actualizar registro existente (sin salario)
     if ($foto && $documento) {
       $stmt = $pdo->prepare(
-        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, foto = ?, salario = ?, notas = ?, documento = ? WHERE id = ?"
+        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, foto = ?, notas = ?, documento = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $cargo, $anio, $foto, $salario, $notas, $documento, $id]);
+      $stmt->execute([$nombre, $cargo, $anio, $foto, $notas, $documento, $id]);
     } elseif ($foto) {
       $stmt = $pdo->prepare(
-        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, foto = ?, salario = ?, notas = ? WHERE id = ?"
+        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, foto = ?, notas = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $cargo, $anio, $foto, $salario, $notas, $id]);
+      $stmt->execute([$nombre, $cargo, $anio, $foto, $notas, $id]);
     } elseif ($documento) {
       $stmt = $pdo->prepare(
-        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, salario = ?, notas = ?, documento = ? WHERE id = ?"
+        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, notas = ?, documento = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $cargo, $anio, $salario, $notas, $documento, $id]);
+      $stmt->execute([$nombre, $cargo, $anio, $notas, $documento, $id]);
     } else {
       $stmt = $pdo->prepare(
-        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, salario = ?, notas = ? WHERE id = ?"
+        "UPDATE mantenimiento SET nombre = ?, cargo = ?, año_ingreso = ?, notas = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $cargo, $anio, $salario, $notas, $id]);
+      $stmt->execute([$nombre, $cargo, $anio, $notas, $id]);
     }
   } else {
-    // Insertar nuevo registro
+    // Insertar nuevo registro (sin salario)
     $stmt = $pdo->prepare(
-      "INSERT INTO mantenimiento (nombre, cargo, año_ingreso, foto, salario, notas, documento) VALUES (?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO mantenimiento (nombre, cargo, año_ingreso, foto, notas, documento) VALUES (?, ?, ?, ?, ?, ?)"
     );
-    $stmt->execute([$nombre, $cargo, $anio, $foto, $salario, $notas, $documento]);
+    $stmt->execute([$nombre, $cargo, $anio, $foto, $notas, $documento]);
   }
   exit('OK');
 }
@@ -146,11 +145,6 @@ $personal = $stmt->fetchAll();
           <label>Año de ingreso:</label>
           <input type="number" name="anio_ingreso" id="pmAnioIngreso" placeholder="Ej: 2018" required min="1980" max="2030">
         </div>
-        
-        <div class="form-group">
-          <label>Salario mensual (L):</label>
-          <input type="number" name="salario" id="pmSalario" placeholder="Ej: 15000.00" step="0.01" min="0" required>
-        </div>
       </div>
       
       <div class="form-group">
@@ -194,7 +188,6 @@ $personal = $stmt->fetchAll();
       <p><strong>Cargo:</strong> <?= htmlspecialchars($p['cargo']) ?></p>
       <p><strong>Año de ingreso:</strong> <?= $p['año_ingreso'] ?></p>
       <p><strong>Años de servicio:</strong> <?= $p['años_servicio'] ?></p>
-      <p><strong>Salario:</strong> L <?= number_format($p['salario'], 2) ?></p>
 
       <?php if ($p['notas']): ?>
         <div class="perfil-notas">
@@ -204,10 +197,20 @@ $personal = $stmt->fetchAll();
       <?php endif; ?>
       
       <?php if ($p['documento']): ?>
-        <div class="perfil-documento">
-          <a href="<?= htmlspecialchars($p['documento']) ?>" target="_blank" class="btn-documento">
-            Ver Documento
-          </a>
+        <div class="perfil-documento" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+          <!-- Ver CV -->
+          <?php if (!empty($p['documento'])): ?>
+            <a href="<?= htmlspecialchars($p['documento']) ?>" target="_blank" class="btn-documento" aria-label="Ver CV de <?= htmlspecialchars($p['nombre']) ?>">
+              Ver CV
+            </a>
+          <?php endif; ?>
+
+          <!-- Ver Constancia -->
+          <?php if (!empty($p['documento2'])): ?>
+            <a href="<?= htmlspecialchars($p['documento2']) ?>" target="_blank" class="btn-documento" aria-label="Ver Constancia de <?= htmlspecialchars($p['nombre']) ?>">
+              Ver Constancia
+            </a>
+          <?php endif; ?>
         </div>
       <?php endif; ?>
       
@@ -219,7 +222,6 @@ $personal = $stmt->fetchAll();
             "nombre" => $p["nombre"],
             "cargo" => $p["cargo"],
             "anio" => $p["año_ingreso"],
-            "salario" => $p["salario"],
             "notas" => $p["notas"]
           ]) ?>)'
           class="btn-primario btn-pequeno"

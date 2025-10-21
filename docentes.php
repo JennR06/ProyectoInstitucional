@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   $nombre          = trim($_POST['nombre']);
   $especialidad    = trim($_POST['especialidad']);
   $anio            = intval($_POST['anio_ingreso']);
-  $salario         = floatval($_POST['salario']);
   $notas           = trim($_POST['notas']);
   $nivel_educativo = trim($_POST['nivel_educativo']);
   $horario         = trim($_POST['horario']);
@@ -20,73 +19,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
     $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
     $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-    
-    if (!in_array(strtolower($ext), $allowed)) {
-      exit('ERROR: Solo se permiten imágenes');
-    }
-    
-    if (!file_exists('img')) {
-      mkdir('img', 0777, true);
-    }
-    
+    if (!in_array(strtolower($ext), $allowed)) exit('ERROR: Solo se permiten imágenes');
+    if (!file_exists('img')) mkdir('img', 0777, true);
     $nombre_archivo = uniqid('docente_') . '.' . $ext;
     $ruta_destino = 'img/' . $nombre_archivo;
-    
-    if (move_uploaded_file($_FILES['foto']['tmp_name'], $ruta_destino)) {
-      $foto = $ruta_destino;
-    }
+    if (move_uploaded_file($_FILES['foto']['tmp_name'], $ruta_destino)) $foto = $ruta_destino;
   }
 
   // Manejo de documento PDF
   $documento = null;
   if (isset($_FILES['documento']) && $_FILES['documento']['error'] === UPLOAD_ERR_OK) {
     $ext = pathinfo($_FILES['documento']['name'], PATHINFO_EXTENSION);
-    
-    if (strtolower($ext) !== 'pdf') {
-      exit('ERROR: Solo se permiten archivos PDF');
-    }
-    
-    if (!file_exists('documentos')) {
-      mkdir('documentos', 0777, true);
-    }
-    
+    if (strtolower($ext) !== 'pdf') exit('ERROR: Solo se permiten archivos PDF');
+    if (!file_exists('documentos')) mkdir('documentos', 0777, true);
     $nombre_doc = uniqid('doc_docente_') . '.pdf';
     $ruta_doc = 'documentos/' . $nombre_doc;
-    
-    if (move_uploaded_file($_FILES['documento']['tmp_name'], $ruta_doc)) {
-      $documento = $ruta_doc;
-    }
+    if (move_uploaded_file($_FILES['documento']['tmp_name'], $ruta_doc)) $documento = $ruta_doc;
   }
 
   if ($id) {
-    // Actualizar registro existente
+    // Actualizar registro existente (sin salario)
     if ($foto && $documento) {
       $stmt = $pdo->prepare(
-        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, foto = ?, salario = ?, notas = ?, documento = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
+        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, foto = ?, notas = ?, documento = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $especialidad, $anio, $foto, $salario, $notas, $documento, $nivel_educativo, $horario, $id]);
+      $stmt->execute([$nombre, $especialidad, $anio, $foto, $notas, $documento, $nivel_educativo, $horario, $id]);
     } elseif ($foto) {
       $stmt = $pdo->prepare(
-        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, foto = ?, salario = ?, notas = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
+        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, foto = ?, notas = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $especialidad, $anio, $foto, $salario, $notas, $nivel_educativo, $horario, $id]);
+      $stmt->execute([$nombre, $especialidad, $anio, $foto, $notas, $nivel_educativo, $horario, $id]);
     } elseif ($documento) {
       $stmt = $pdo->prepare(
-        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, salario = ?, notas = ?, documento = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
+        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, notas = ?, documento = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $especialidad, $anio, $salario, $notas, $documento, $nivel_educativo, $horario, $id]);
+      $stmt->execute([$nombre, $especialidad, $anio, $notas, $documento, $nivel_educativo, $horario, $id]);
     } else {
       $stmt = $pdo->prepare(
-        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, salario = ?, notas = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
+        "UPDATE docentes SET nombre = ?, especialidad = ?, año_ingreso = ?, notas = ?, nivel_educativo = ?, horario = ? WHERE id = ?"
       );
-      $stmt->execute([$nombre, $especialidad, $anio, $salario, $notas, $nivel_educativo, $horario, $id]);
+      $stmt->execute([$nombre, $especialidad, $anio, $notas, $nivel_educativo, $horario, $id]);
     }
   } else {
-    // Insertar nuevo registro
+    // Insertar nuevo registro (sin salario)
     $stmt = $pdo->prepare(
-      "INSERT INTO docentes (nombre, especialidad, año_ingreso, foto, salario, notas, documento, nivel_educativo, horario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO docentes (nombre, especialidad, año_ingreso, foto, notas, documento, nivel_educativo, horario) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
     );
-    $stmt->execute([$nombre, $especialidad, $anio, $foto, $salario, $notas, $documento, $nivel_educativo, $horario]);
+    $stmt->execute([$nombre, $especialidad, $anio, $foto, $notas, $documento, $nivel_educativo, $horario]);
   }
   exit('OK');
 }
@@ -97,15 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
   $stmt = $pdo->prepare("SELECT foto, documento FROM docentes WHERE id = ?");
   $stmt->execute([$_POST['delete']]);
   $docente = $stmt->fetch();
-  
+
   // Eliminar archivos físicos
-  if ($docente['foto'] && file_exists($docente['foto'])) {
-    unlink($docente['foto']);
-  }
-  if ($docente['documento'] && file_exists($docente['documento'])) {
-    unlink($docente['documento']);
-  }
-  
+  if ($docente['foto'] && file_exists($docente['foto'])) @unlink($docente['foto']);
+  if ($docente['documento'] && file_exists($docente['documento'])) @unlink($docente['documento']);
+
   // Eliminar registro de BD
   $stmt = $pdo->prepare("DELETE FROM docentes WHERE id = ?");
   $stmt->execute([$_POST['delete']]);
@@ -147,11 +122,6 @@ $docentes = $stmt->fetchAll();
         <div class="form-group">
           <label>Año de ingreso:</label>
           <input type="number" name="anio_ingreso" id="docAnioIngreso" placeholder="Ej: 2015" required min="1980" max="2030">
-        </div>
-        
-        <div class="form-group">
-          <label>Salario mensual (L):</label>
-          <input type="number" name="salario" id="docSalario" placeholder="Ej: 18000.00" step="0.01" min="0" required>
         </div>
         
         <div class="form-group">
@@ -198,6 +168,7 @@ $docentes = $stmt->fetchAll();
   </div>
 </div>
 
+
 <!-- Tarjetas de docentes -->
 <div class="perfil-lista">
   <?php foreach ($docentes as $d): ?>
@@ -214,7 +185,6 @@ $docentes = $stmt->fetchAll();
       <p><strong>Año de ingreso:</strong> <?= $d['año_ingreso'] ?></p>
       <p><strong>Años de servicio:</strong> <?= $d['años_servicio'] ?></p>
       <p><strong>Horario:</strong> <?= htmlspecialchars($d['horario']) ?></p>
-      <p><strong>Salario:</strong> L <?= number_format($d['salario'], 2) ?></p>
       
       <?php if ($d['notas']): ?>
         <div class="perfil-notas">
@@ -225,8 +195,8 @@ $docentes = $stmt->fetchAll();
       
       <?php if ($d['documento']): ?>
         <div class="perfil-documento">
-          <a href="<?= htmlspecialchars($d['documento']) ?>" target="_blank" class="btn-documento">
-            Ver Documento
+          <a href="<?= htmlspecialchars($d['documento']) ?>" target="_blank" class="btn-documento" aria-label="Ver CV de <?= htmlspecialchars($d['nombre']) ?>">
+            Ver CV
           </a>
         </div>
       <?php endif; ?>
@@ -239,7 +209,6 @@ $docentes = $stmt->fetchAll();
             "nombre" => $d["nombre"],
             "especialidad" => $d["especialidad"],
             "anio" => $d["año_ingreso"],
-            "salario" => $d["salario"],
             "notas" => $d["notas"],
             "nivel_educativo" => $d["nivel_educativo"],
             "horario" => $d["horario"]
@@ -253,5 +222,8 @@ $docentes = $stmt->fetchAll();
         >Eliminar</button>
       </div>
     </div>
+
+
+    
   <?php endforeach; ?>
 </div>
