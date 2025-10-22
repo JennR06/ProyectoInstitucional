@@ -12,16 +12,9 @@ try {
   $oficiales = $docentes = $mantenimiento = $administrativo = $total = 0;
 }
 
-// Personal veterano (top 5)
-try {
-  $veteranos = $pdo->query("
-    SELECT nombre, rango AS cargo, YEAR(CURDATE()) - años_asignado AS anos, 'Oficial' AS tipo 
-    FROM oficiales
-    ORDER BY anos DESC LIMIT 5
-  ")->fetchAll();
-} catch (PDOException $e) {
-  $veteranos = [];
-}
+// Obtener parámetros de filtro
+$filtro_tipo = $_GET['tipo'] ?? 'todos';
+$filtro_genero = $_GET['genero'] ?? 'todos';
 ?>
 
 <div class="dashboard-container">
@@ -81,21 +74,42 @@ try {
 
   </div>
 
-  <!-- Personal veterano -->
-  <?php if (count($veteranos) > 0): ?>
+  <!-- Personal veterano con filtros AJAX -->
   <div class="dashboard-card">
-    <h3>Personal con Más Antigüedad</h3>
-    <div class="veteranos-list">
-      <?php foreach ($veteranos as $v): ?>
-        <div class="veterano-item">
-          <span>👤 <?= htmlspecialchars($v['nombre']) ?></span>
-          <span class="veterano-cargo"><?= htmlspecialchars($v['cargo']) ?></span>
-          <span class="veterano-anos"><?= $v['anos'] ?> años</span>
+    <div class="filtros-header">
+      <h3>Personal</h3>
+      <div class="filtros-container">
+        <div class="filtros-form">
+          <div class="filtro-group">
+            <label for="tipo">Tipo de Personal:</label>
+            <select name="tipo" id="tipo" onchange="aplicarFiltros()">
+              <option value="todos" <?= $filtro_tipo == 'todos' ? 'selected' : '' ?>>Todos</option>
+              <option value="Oficial" <?= $filtro_tipo == 'Oficial' ? 'selected' : '' ?>>Oficiales</option>
+              <option value="Docente" <?= $filtro_tipo == 'Docente' ? 'selected' : '' ?>>Docentes</option>
+              <option value="Mantenimiento" <?= $filtro_tipo == 'Mantenimiento' ? 'selected' : '' ?>>Mantenimiento</option>
+              <option value="Administrativo" <?= $filtro_tipo == 'Administrativo' ? 'selected' : '' ?>>Administrativo</option>
+            </select>
+          </div>
+          
+          <div class="filtro-group">
+            <label for="genero">Género:</label>
+            <select name="genero" id="genero" onchange="aplicarFiltros()">
+              <option value="todos" <?= $filtro_genero == 'todos' ? 'selected' : '' ?>>Todos</option>
+              <option value="M" <?= $filtro_genero == 'M' ? 'selected' : '' ?>>Masculino</option>
+              <option value="F" <?= $filtro_genero == 'F' ? 'selected' : '' ?>>Femenino</option>
+            </select>
+          </div>
+          
+          <button type="button" onclick="limpiarFiltros()" class="btn-limpiar">Limpiar Filtros</button>
         </div>
-      <?php endforeach; ?>
+      </div>
+    </div>
+    
+    <!-- Contenedor para los resultados AJAX -->
+    <div id="resultados-veteranos">
+      <?php include 'obtener_veteranos.php'; ?>
     </div>
   </div>
-  <?php endif; ?>
 
   <!-- Accesos rápidos -->
   <div class="dashboard-card">
@@ -117,3 +131,118 @@ try {
   </div>
 
 </div>
+
+
+<script>
+// Variable global para almacenar los filtros actuales
+let filtrosActuales = {
+    tipo: '<?= $filtro_tipo ?>',
+    genero: '<?= $filtro_genero ?>'
+};
+
+function aplicarFiltros() {
+    // Mostrar loading
+    const contenedor = document.getElementById('resultados-veteranos');
+    contenedor.innerHTML = '<div class="loading">🔄 Cargando resultados...</div>';
+    
+    // Obtener valores actuales
+    const tipo = document.getElementById('tipo').value;
+    const genero = document.getElementById('genero').value;
+    
+    // Actualizar filtros globales
+    filtrosActuales.tipo = tipo;
+    filtrosActuales.genero = genero;
+    
+    // Actualizar URL sin recargar la página
+    const params = new URLSearchParams();
+    if (tipo !== 'todos') params.set('tipo', tipo);
+    if (genero !== 'todos') params.set('genero', genero);
+    
+    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    window.history.replaceState({}, '', newUrl);
+    
+    // Realizar petición AJAX
+    fetch(`obtener_veteranos.php?tipo=${tipo}&genero=${genero}`)
+        .then(response => response.text())
+        .then(html => {
+            contenedor.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            contenedor.innerHTML = '<div class="error">❌ Error al cargar los datos</div>';
+        });
+}
+
+function limpiarFiltros() {
+    document.getElementById('tipo').value = 'todos';
+    document.getElementById('genero').value = 'todos';
+    aplicarFiltros();
+}
+
+// Funciones de exportación que usan los filtros actuales
+function exportToPDF() {
+    const { tipo, genero } = filtrosActuales;
+    
+    // Mostrar loading en el botón
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Generando PDF...';
+    btn.disabled = true;
+    
+    // Abrir exportación con filtros
+    const url = `export_pdf.php?tipo=${tipo}&genero=${genero}`;
+    window.open(url, '_blank');
+    
+    // Restaurar botón después de 2 segundos
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 2000);
+}
+
+function exportToExcel() {
+    const { tipo, genero } = filtrosActuales;
+    
+    // Mostrar loading en el botón
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Generando Excel...';
+    btn.disabled = true;
+    
+    // Forzar descarga con filtros
+    const link = document.createElement('a');
+    link.href = `export_excel.php?tipo=${tipo}&genero=${genero}`;
+    link.download = `reporte_personal_${new Date().toISOString().split('T')[0]}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Restaurar botón después de 2 segundos
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 2000);
+}
+
+// Aplicar filtros al cargar la página si hay parámetros en URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipo = urlParams.get('tipo');
+    const genero = urlParams.get('genero');
+    
+    if (tipo || genero) {
+        if (tipo) document.getElementById('tipo').value = tipo;
+        if (genero) document.getElementById('genero').value = genero;
+        aplicarFiltros();
+    }
+});
+
+// Función para mostrar secciones (ya existente en tu script)
+function mostrar(seccion) {
+    // Tu código existente para mostrar secciones
+    if (seccion === 'reportes') {
+        window.location.reload(); // Recargar para ver el dashboard
+    }
+    // ... resto de tu código existente
+}
+</script>

@@ -706,7 +706,7 @@ function exportToPDF() {
     // Mostrar loading
     const btn = event.target;
     const originalText = btn.innerHTML;
-    btn.innerHTML = '⏳ Generando...';
+    btn.innerHTML = 'Generando...';
     btn.disabled = true;
     
     // Abrir en nueva pestaña o descargar
@@ -723,7 +723,7 @@ function exportToExcel() {
     // Mostrar loading
     const btn = event.target;
     const originalText = btn.innerHTML;
-    btn.innerHTML = '⏳ Generando...';
+    btn.innerHTML = 'Generando...';
     btn.disabled = true;
     
     // Forzar descarga
@@ -740,3 +740,104 @@ function exportToExcel() {
         btn.disabled = false;
     }, 2000);
 }
+
+// Variable global para almacenar los filtros actuales
+let filtrosActuales = {
+    tipo: '<?= $filtro_tipo ?>',
+    genero: '<?= $filtro_genero ?>'
+};
+
+function aplicarFiltros() {
+    // Mostrar loading
+    const contenedor = document.getElementById('resultados-veteranos');
+    contenedor.innerHTML = '<div class="loading">Cargando...</div>';
+    
+    // Obtener valores actuales
+    const tipo = document.getElementById('tipo').value;
+    const genero = document.getElementById('genero').value;
+    
+    // Actualizar filtros globales
+    filtrosActuales.tipo = tipo;
+    filtrosActuales.genero = genero;
+    
+    // Realizar petición AJAX
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `obtener_veteranos.php?tipo=${tipo}&genero=${genero}`, true);
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            contenedor.innerHTML = xhr.responseText;
+        } else {
+            contenedor.innerHTML = '<div class="error">Error al cargar los datos</div>';
+        }
+    };
+    
+    xhr.onerror = function() {
+        contenedor.innerHTML = '<div class="error">Error de conexión</div>';
+    };
+    
+    xhr.send();
+}
+
+function limpiarFiltros() {
+    document.getElementById('tipo').value = 'todos';
+    document.getElementById('genero').value = 'todos';
+    aplicarFiltros();
+}
+
+// Funciones de exportación que usan los filtros actuales
+function exportToPDF() {
+    const { tipo, genero } = filtrosActuales;
+    
+    // Mostrar loading en el botón
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Generando...';
+    btn.disabled = true;
+    
+    // Abrir exportación con filtros
+    window.open(`export_pdf.php?tipo=${tipo}&genero=${genero}`, '_blank');
+    
+    // Restaurar botón después de 2 segundos
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 2000);
+}
+
+function exportToExcel() {
+    const { tipo, genero } = filtrosActuales;
+    
+    // Mostrar loading en el botón
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Generando...';
+    btn.disabled = true;
+    
+    // Forzar descarga con filtros
+    const link = document.createElement('a');
+    link.href = `export_excel.php?tipo=${tipo}&genero=${genero}`;
+    link.download = `reporte_personal_${new Date().toISOString().split('T')[0]}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Restaurar botón después de 2 segundos
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 2000);
+}
+
+// Aplicar filtros al cargar la página si hay parámetros en URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipo = urlParams.get('tipo');
+    const genero = urlParams.get('genero');
+    
+    if (tipo || genero) {
+        if (tipo) document.getElementById('tipo').value = tipo;
+        if (genero) document.getElementById('genero').value = genero;
+        aplicarFiltros();
+    }
+});
