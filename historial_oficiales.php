@@ -7,17 +7,30 @@ require 'bd.php';
 // 1) Crear o actualizar (solo si POST AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   $id      = $_POST['id'] ?: null;
-  $nombre  = trim($_POST['nombre']);
-  $rango   = trim($_POST['rango']);
-  $anio    = intval($_POST['anios_asignado']);
-  $notas   = trim($_POST['notas']);
+  $nombre  = trim($_POST['nombre'] ?? '');
+  $rango   = trim($_POST['rango'] ?? '');
+  $anio    = intval($_POST['anios_asignado'] ?? 0);
+  $notas   = trim($_POST['notas'] ?? '');
 
-  // Obtener archivos existentes si vamos a actualizar
-  $existing = ['foto' => null, 'documento' => null, 'estado' => null];
+  // Campos adicionales del formulario
+  $numero_identificacion = trim($_POST['numero_identificacion'] ?? '') ?: null;
+  $fecha_nacimiento      = trim($_POST['fecha_nacimiento'] ?? '') ?: null; // formato YYYY-MM-DD desde <input type="date">
+  $numero_telefono       = trim($_POST['numero_telefono'] ?? '') ?: null;
+  $direccion             = trim($_POST['direccion'] ?? '') ?: null;
+  $estado_civil          = trim($_POST['estado_civil'] ?? '') ?: null;
+  $departamento          = trim($_POST['departamento'] ?? '') ?: null;
+  $genero                = trim($_POST['genero'] ?? '') ?: null;
+
+  // Obtener archivos existentes y demás campos si vamos a actualizar (para conservar si no se envían)
+  $existing = [
+    'foto' => null, 'documento' => null, 'estado' => null,
+    'numero_identificacion' => null, 'fecha_nacimiento' => null, 'numero_telefono' => null,
+    'direccion' => null, 'estado_civil' => null, 'departamento' => null, 'genero' => null
+  ];
   if ($id) {
-    $stmtEx = $pdo->prepare("SELECT foto, documento, estado FROM oficiales WHERE id = ?");
+    $stmtEx = $pdo->prepare("SELECT foto, documento, estado, numero_identificacion, fecha_nacimiento, numero_telefono, direccion, estado_civil, departamento, genero FROM oficiales WHERE id = ?");
     $stmtEx->execute([$id]);
-    $f = $stmtEx->fetch();
+    $f = $stmtEx->fetch(PDO::FETCH_ASSOC);
     if ($f) $existing = array_merge($existing, $f);
   }
  
@@ -26,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   $allowedStatuses = ['traslado','permiso','activo','faltista','retirado'];
   $final_estado = in_array($estadoInput, $allowedStatuses) ? $estadoInput : ($existing['estado'] ?? 'activo');
  
-  // Manejo de imagen de perfil
+  // Manejo de imagen de perfil (si se sube reemplaza, si no conserva existente)
   $foto = null;
   if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
     $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
@@ -52,16 +65,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   // Conservar existentes si no se sube nuevo
   $final_foto = $foto ?? $existing['foto'];
   $final_doc1 = $documento ?? $existing['documento'];
-  
+
+  // Conservar valores existentes si el formulario no envía (evita sobrescribir con NULL)
+  $final_numero_identificacion = $numero_identificacion ?? $existing['numero_identificacion'];
+  $final_fecha_nacimiento      = $fecha_nacimiento ?: $existing['fecha_nacimiento'];
+  $final_numero_telefono       = $numero_telefono ?? $existing['numero_telefono'];
+  $final_direccion             = $direccion ?? $existing['direccion'];
+  $final_estado_civil          = $estado_civil ?? $existing['estado_civil'];
+  $final_departamento          = $departamento ?? $existing['departamento'];
+  $final_genero                = $genero ?? $existing['genero'];
  
   if ($id) {
-    // incluye estado al actualizar
-    $stmt = $pdo->prepare("UPDATE oficiales SET nombre = ?, rango = ?, años_asignado = ?, notas = ?, documento = ?, foto = ?, estado = ? WHERE id = ?");
-    $stmt->execute([$nombre, $rango, $anio, $notas, $final_doc1, $final_foto, $final_estado, $id]);
+    // incluye todos los campos al actualizar
+    $stmt = $pdo->prepare("UPDATE oficiales SET nombre = ?, rango = ?, años_asignado = ?, notas = ?, documento = ?, foto = ?, estado = ?, numero_identificacion = ?, fecha_nacimiento = ?, numero_telefono = ?, direccion = ?, estado_civil = ?, departamento = ?, genero = ? WHERE id = ?");
+    $stmt->execute([
+      $nombre, $rango, $anio, $notas, $final_doc1, $final_foto, $final_estado,
+      $final_numero_identificacion, $final_fecha_nacimiento, $final_numero_telefono,
+      $final_direccion, $final_estado_civil, $final_departamento, $final_genero,
+      $id
+    ]);
   } else {
-    // incluye estado al insertar
-    $stmt = $pdo->prepare("INSERT INTO oficiales (nombre, rango, años_asignado, notas, documento, foto, estado) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$nombre, $rango, $anio, $notas, $final_doc1, $final_foto, $final_estado]);
+    // insertar nuevo registro con todos los campos
+    $stmt = $pdo->prepare("INSERT INTO oficiales (nombre, rango, años_asignado, notas, documento, foto, estado, numero_identificacion, fecha_nacimiento, numero_telefono, direccion, estado_civil, departamento, genero) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([
+      $nombre, $rango, $anio, $notas, $final_doc1, $final_foto, $final_estado,
+      $final_numero_identificacion, $final_fecha_nacimiento, $final_numero_telefono,
+      $final_direccion, $final_estado_civil, $final_departamento, $final_genero
+    ]);
   }
  
   exit('OK');
@@ -98,7 +128,7 @@ $oficiales = $stmt->fetchAll();
   </div>
 
   <div class="controls-der">
-    <button type="button" onclick="mostrarFormOficial()" class="btn btn-primario btn-nuevo-oficial">+ Nuevo Oficial</button>
+    <button id="btnNuevoOficial" type="button" onclick="mostrarFormOficial()" class="btn btn-primario btn-nuevo-oficial">+ Nuevo Oficial</button>
   </div>
 </div>
 
@@ -108,7 +138,7 @@ $oficiales = $stmt->fetchAll();
 
 <!-- FORMULARIO (MODAL) -->
 <div id="formDivOficial" class="modal-overlay" aria-hidden="true" style="display:none;">
-  <div class="modal-form modal-form-amplio" role="dialog" aria-modal="true" aria-labelledby="modalTituloOficial">
+  <div class="modal-form modal-form-amplio" role="dialog" aria-modal="true" aria-labelledby="modalTituloOficial" tabindex="-1">
     <h3 id="modalTituloOficial">📋 Agregar / Editar Oficial</h3>
     <form id="oficialForm" enctype="multipart/form-data" autocomplete="off">
       <input type="hidden" name="id" id="ofId">
@@ -365,4 +395,3 @@ function imprimirDocumento(url) {
   setTimeout(() => { try { w.print(); } catch(e){} }, 900);
 }
 </script>
-

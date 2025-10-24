@@ -143,30 +143,74 @@ function mostrar(seccion) {
 
 window.mostrarFormOficial = function() {
   const modal = document.getElementById('formDivOficial');
-  if (modal) {
-    modal.style.display = 'flex';
-    document.getElementById('ofId').value = '';
-    document.getElementById('ofNombre').value = '';
-    document.getElementById('ofRango').value = '';
-    document.getElementById('ofAniosAsignado').value = '';
-    document.getElementById('ofNotas').value = '';
-    document.getElementById('ofNumeroIdentificacion').value = '';
-    document.getElementById('ofFechaNacimiento').value = '';
-    document.getElementById('ofNumeroTelefono').value = '';
-    document.getElementById('ofDireccion').value = '';
-    document.getElementById('ofEstadoCivil').value = '';
-    document.getElementById('ofDepartamento').value = '';
-    document.getElementById('ofFoto').value = '';
-    document.getElementById('ofDocumento').value = '';
+  if (!modal) return;
+  // guardar elemento que tenía foco para restaurarlo luego
+  window.__lastFocused = document.activeElement;
+
+  // mostrar modal y marcar accesibilidad
+  modal.style.display = 'flex';
+  modal.removeAttribute('aria-hidden');
+
+  const dialog = modal.querySelector('.modal-form') || modal;
+  if (dialog) {
+    dialog.setAttribute('tabindex', '-1');
+    // mover foco al primer control o al dialog si no hay controles
+    const focusables = getFocusableElements(dialog);
+    const first = focusables.length ? focusables[0] : dialog;
+    first.focus();
   }
-}
+
+  // instalar focus-trap
+  const container = dialog || modal;
+  window.__focusTrapHandler = function(e) {
+    if (e.key !== 'Tab') return;
+    const focusables = getFocusableElements(container);
+    if (!focusables.length) {
+      e.preventDefault();
+      return;
+    }
+    const firstEl = focusables[0];
+    const lastEl = focusables[focusables.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === firstEl) {
+        e.preventDefault();
+        lastEl.focus();
+      }
+    } else {
+      if (document.activeElement === lastEl) {
+        e.preventDefault();
+        firstEl.focus();
+      }
+    }
+  };
+  document.addEventListener('keydown', window.__focusTrapHandler);
+};
 
 window.cerrarFormOficial = function() {
   const modal = document.getElementById('formDivOficial');
-  if (modal) {
-    modal.style.display = 'none';
+  if (!modal) return;
+
+  // quitar listener de focus-trap
+  if (window.__focusTrapHandler) {
+    document.removeEventListener('keydown', window.__focusTrapHandler);
+    window.__focusTrapHandler = null;
   }
-}
+
+  // ocultar modal y actualizar accesibilidad
+  // antes de esconder, mover foco fuera del modal (a opener si existe)
+  const last = window.__lastFocused;
+  try {
+    if (last && typeof last.focus === 'function') last.focus();
+  } catch (e) { /* ignore */ }
+
+  // forzar blur dentro del modal para evitar warning aria-hidden sobre elemento con foco
+  const activeInside = modal.contains(document.activeElement) ? document.activeElement : null;
+  if (activeInside && typeof activeInside.blur === 'function') activeInside.blur();
+
+  modal.setAttribute('aria-hidden', 'true');
+  modal.style.display = 'none';
+  window.__lastFocused = null;
+};
 
 window.editarOficial = function(datos) {
   const modal = document.getElementById('formDivOficial');
@@ -257,6 +301,17 @@ function inicializarEventosOficiales() {
       return false;
     };
   }
+}
+
+// foco/modal management helpers
+window.__lastFocused = null;
+window.__focusTrapHandler = null;
+
+function getFocusableElements(container) {
+  if (!container) return [];
+  return Array.from(container.querySelectorAll(
+    'a[href], area[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex]:not([tabindex="-1"]), [contenteditable]'
+  )).filter(el => el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
 
 // ========================================
@@ -591,59 +646,6 @@ function inicializarEventosAdministrativo() {
 }
 
 
-// FUNCIONES PARA NOOTIFICACIONES
-
-
-window.mostrarFormNotificacion = function() {
-  document.getElementById('formDivNotificacion').style.display = 'flex';
-};
-
-window.cerrarFormNotificacion = function() {
-  document.getElementById('formDivNotificacion').style.display = 'none';
-};
-
-window.eliminarNotificacion = function(id) {
-  if (!confirm('¿Eliminar esta notificación?')) return;
-  const datos = new FormData();
-  datos.append('delete', id);
-
-  fetch('notificaciones.php', {
-    method: 'POST',
-    body: datos
-  })
-  .then(res => res.text())
-  .then(resp => {
-    alert('✅ Eliminada');
-    mostrar('notificaciones');
-  });
-};
-
-function inicializarEventosNotificaciones() {
-  const form = document.getElementById('notificacionForm');
-  if (form) {
-    form.onsubmit = function(e) {
-      e.preventDefault();
-      const datos = new FormData(form);
-      datos.append('ajax', '1');
-
-      fetch('notificaciones.php', {
-        method: 'POST',
-        body: datos
-      })
-      .then(res => res.text())
-      .then(resp => {
-        if (resp.trim() === 'OK') {
-          alert('✅ Notificación guardada');
-          cerrarFormNotificacion();
-          mostrar('notificaciones');
-        } else {
-          alert('⚠️ Error: ' + resp);
-        }
-      });
-    };
-  }
-}
-
 // ========================================
 // FUNCIONES PARA REPORTES
 // ========================================
@@ -702,7 +704,7 @@ window.Inicio = function() {
     contenido.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
-// ...existing code...
+
 
 function imprimirDocumento(url) {
   if (!url) return alert('Documento no disponible');
@@ -854,7 +856,5 @@ document.addEventListener('DOMContentLoaded', function() {
         aplicarFiltros();
     }
 });
-
-
 
 
