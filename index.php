@@ -112,7 +112,7 @@
     <!-- Contenedor dinámico -->
    <main class="content" id="contenido">
     <div class="bienvenida">
-    <h2>🎖️ Bienvenidos al Sistema INTEGRA</h2>
+    <h2> Bienvenidos al Sistema INTEGRA</h2>
     
     <p class="intro">
       Este sistema ha sido diseñado para fortalecer la gestión del personal del <strong>Liceo Militar de Honduras</strong>, 
@@ -128,7 +128,6 @@
       <ul>
         <li> - Consultar historial del personal</li>
         <li> -  Visualizar reportes</li>
-        <li> - Recibir notificaciones importantes</li>
       </ul>
     </div>
 

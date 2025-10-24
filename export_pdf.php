@@ -6,7 +6,7 @@ $filtro_tipo = $_GET['tipo'] ?? 'todos';
 $filtro_genero = $_GET['genero'] ?? 'todos';
 
 // Incluir Dompdf manualmente
-require_once 'vendor/dompdf/autoload.inc.php';
+require_once 'vendor/dompdf/dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -112,7 +112,7 @@ $html = '
 </head>
 <body>
     <div class="header">
-        <h1>Reporte de Personal</h1>
+        <h1>Reporte de Personal con Más Antigüedad</h1>
         <p><strong>Sistema INTEGRA</strong> - ' . date('d/m/Y H:i:s') . '</p>
     </div>
     
@@ -187,3 +187,4 @@ if ($filtro_genero !== 'todos') {
 $nombre_archivo .= "_" . date('Y-m-d') . ".pdf";
 
 $dompdf->stream($nombre_archivo, array("Attachment" => true));
+?>

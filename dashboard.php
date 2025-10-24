@@ -186,7 +186,7 @@ function exportToPDF() {
     // Mostrar loading en el botón
     const btn = event.target;
     const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando PDF...';
+    btn.innerHTML = '⏳ Generando PDF...';
     btn.disabled = true;
     
     // Abrir exportación con filtros
@@ -206,7 +206,7 @@ function exportToExcel() {
     // Mostrar loading en el botón
     const btn = event.target;
     const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando Excel...';
+    btn.innerHTML = '⏳ Generando Excel...';
     btn.disabled = true;
     
     // Forzar descarga con filtros

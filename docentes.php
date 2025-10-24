@@ -168,7 +168,6 @@ $docentes = $stmt->fetchAll();
   </div>
 </div>
 
-
 <!-- Tarjetas de docentes -->
 <div class="perfil-lista">
   <?php foreach ($docentes as $d): ?>
@@ -195,8 +194,8 @@ $docentes = $stmt->fetchAll();
       
       <?php if ($d['documento']): ?>
         <div class="perfil-documento">
-          <a href="<?= htmlspecialchars($d['documento']) ?>" target="_blank" class="btn-documento" aria-label="Ver CV de <?= htmlspecialchars($d['nombre']) ?>">
-            Ver CV
+          <a href="<?= htmlspecialchars($d['documento']) ?>" target="_blank" class="btn-documento">
+            Ver Perfil
           </a>
         </div>
       <?php endif; ?>
@@ -205,25 +204,23 @@ $docentes = $stmt->fetchAll();
         <button
           type="button"
           onclick='editarDocente(<?= json_encode([
-            "id" => $d["id"],
-            "nombre" => $d["nombre"],
-            "especialidad" => $d["especialidad"],
-            "anio" => $d["año_ingreso"],
-            "notas" => $d["notas"],
-            "nivel_educativo" => $d["nivel_educativo"],
-            "horario" => $d["horario"]
-          ]) ?>)'
+            "id" => $id,
+            "nombre" => $nombre,
+            "especialidad" => $especialidad,
+            "anio" => $anio_ingreso,
+            "notas" => $notas,
+            "nivel_educativo" => $nivel_educativo,
+            "horario" => $horario
+          ], JSON_UNESCAPED_UNICODE) ?>)'
           class="btn-primario btn-pequeno"
         >Editar</button>
+
         <button
           type="button"
-          onclick="eliminarDocente(<?= $d['id'] ?>)"
+          onclick="eliminarDocente(<?= $id ?>)"
           class="btn-secundario btn-pequeno"
         >Eliminar</button>
       </div>
     </div>
-
-
-    
   <?php endforeach; ?>
 </div>

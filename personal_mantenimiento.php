@@ -201,7 +201,7 @@ $personal = $stmt->fetchAll();
           <!-- Ver CV -->
           <?php if (!empty($p['documento'])): ?>
             <a href="<?= htmlspecialchars($p['documento']) ?>" target="_blank" class="btn-documento" aria-label="Ver CV de <?= htmlspecialchars($p['nombre']) ?>">
-              Ver CV
+              Ver Perfil
             </a>
           <?php endif; ?>
 
@@ -215,6 +215,10 @@ $personal = $stmt->fetchAll();
       <?php endif; ?>
       
       <div class="perfil-acciones">
+        <!-- Ver Perfil: abre modal con la ficha del personal -->
+      
+      </button>
+
         <button
           type="button"
           onclick='editarMantenimiento(<?= json_encode([
@@ -235,3 +239,104 @@ $personal = $stmt->fetchAll();
     </div>
   <?php endforeach; ?>
 </div>
+
+<!-- Modal: Ficha Personal de Mantenimiento -->
+<div id="perfilMantenimientoModal" class="modal-overlay" style="display:none;">
+  <div class="modal-form modal-form-amplio" role="dialog" aria-modal="true" aria-labelledby="perfilMantenimientoTitulo">
+    <h3 id="perfilMantenimientoTitulo">FICHA - Personal de Mantenimiento</h3>
+
+    <div class="ficha-grid">
+      <section>
+        <h4>DATOS PERSONALES</h4>
+        <p><strong>Nombre completo:</strong> <span id="m_f_nombre">—</span></p>
+        <p><strong>Documento de identidad:</strong> <span id="m_f_documento_identidad">—</span></p>
+        <p><strong>Fecha de nacimiento:</strong> <span id="m_f_fecha_nacimiento">—</span></p>
+        <p><strong>Nacionalidad:</strong> <span id="m_f_nacionalidad">—</span></p>
+        <p><strong>Género:</strong> <span id="m_f_genero">—</span></p>
+        <p><strong>Estado civil:</strong> <span id="m_f_estado_civil">—</span></p>
+        <p><strong>Teléfono(s):</strong> <span id="m_f_telefonos">—</span></p>
+        <p><strong>Correo personal:</strong> <span id="m_f_correo_personal">—</span></p>
+        <p><strong>Correo institucional:</strong> <span id="m_f_correo_institucional">—</span></p>
+        <p><strong>Dirección domiciliaria:</strong> <span id="m_f_direccion">—</span></p>
+      </section>
+
+      <section>
+        <h4>ZONAS / EDIFICIOS A SU CARGO</h4>
+        <p id="m_f_zonas">—</p>
+
+        <h4>ACTIVIDADES PRINCIPALES</h4>
+        <p id="m_f_actividades">—</p>
+      </section>
+    </div>
+
+    <div class="form-buttons" style="margin-top:0.8rem;">
+      <button type="button" onclick="cerrarPerfilMantenimiento()" class="btn btn-secundario">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Parsear data-doc y mostrar modal
+function mostrarPerfilMantenimientoFromButton(btn){
+  try {
+    const json = btn.getAttribute('data-doc') || '{}';
+    const data = JSON.parse(json);
+    mostrarPerfilMantenimiento(data);
+  } catch (e) {
+    console.error('Error al leer data-doc:', e);
+    alert('Error al abrir el perfil.');
+  }
+}
+
+function mostrarPerfilMantenimiento(data) {
+  try {
+    document.getElementById('m_f_nombre').textContent = data.nombre || '—';
+    document.getElementById('m_f_documento_identidad').textContent = data.documento_identidad || '—';
+    document.getElementById('m_f_fecha_nacimiento').textContent = data.fecha_nacimiento || '—';
+    document.getElementById('m_f_nacionalidad').textContent = data.nacionalidad || '—';
+    document.getElementById('m_f_genero').textContent = data.genero || '—';
+    document.getElementById('m_f_estado_civil').textContent = data.estado_civil || '—';
+    document.getElementById('m_f_telefonos').textContent = data.telefonos || '—';
+    document.getElementById('m_f_correo_personal').textContent = data.correo_personal || '—';
+    document.getElementById('m_f_correo_institucional').textContent = data.correo_institucional || '—';
+    document.getElementById('m_f_direccion').textContent = data.direccion || '—';
+
+    // zonas y actividades (si vienen como texto coma-sep o texto libre)
+    document.getElementById('m_f_zonas').textContent = data.zonas || '—';
+    document.getElementById('m_f_actividades').textContent = data.actividades || '—';
+
+    const modal = document.getElementById('perfilMantenimientoModal');
+    if(!modal) throw new Error('Modal no encontrado');
+    modal.style.display = 'block';
+    modal.setAttribute('aria-hidden','false');
+
+    // cerrar con Esc
+    const escHandler = (e) => { if (e.key === 'Escape') cerrarPerfilMantenimiento(); };
+    document.addEventListener('keydown', escHandler);
+    modal._escHandler = escHandler;
+  } catch (err) {
+    console.error('mostrarPerfilMantenimiento error:', err);
+    alert('No se pudo abrir el perfil.');
+  }
+}
+
+function cerrarPerfilMantenimiento() {
+  const modal = document.getElementById('perfilMantenimientoModal');
+  if(!modal) return;
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+  if (modal._escHandler) {
+    document.removeEventListener('keydown', modal._escHandler);
+    modal._escHandler = null;
+  }
+}
+
+// Cerrar si clic afuera del contenido
+document.addEventListener('click', function(e){
+  const modal = document.getElementById('perfilMantenimientoModal');
+  if(!modal || modal.style.display !== 'block') return;
+  const content = modal.querySelector('.modal-form');
+  if(!content) return;
+  if(!content.contains(e.target)) cerrarPerfilMantenimiento();
+});
+</script>

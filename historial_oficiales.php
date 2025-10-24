@@ -128,29 +128,91 @@ $oficiales = $stmt->fetchAll();
           <label for="ofAniosAsignado">Año de asignación</label>
           <input type="number" name="anios_asignado" id="ofAniosAsignado" placeholder="Ej: 2020" required min="1980" max="2030">
         </div>
-      </div>
+      
 
       <div class="form-group">
         <label for="ofNotas">Notas adicionales</label>
         <textarea name="notas" id="ofNotas" rows="4" placeholder="Observaciones, reconocimientos, historial, etc."></textarea>
       </div>
 
+      <div class="form-group">
+        <label for="ofNumeroIdentificacion">Numero de identificación</label>
+        <textarea name="numero_identificacion" id="ofNumeroIdentificacion" rows="4" placeholder="Numero de identificación"></textarea>
+      </div>
+
+    <div class="form-group">
+        <label for="ofFechaNacimiento">Fecha de Nacimiento</label>
+        <input type="date" name="fecha_nacimiento" id="ofFechaNacimiento" required>
+      </div>  
+
+      <div class="form-group">
+        <label for="ofNumeroTelefono">Número de Teléfono</label>
+        <input type="text" name="numero_telefono" id="ofNumeroTelefono" placeholder="Ej: +504 1234-5678" required>
+      </div>
+
+      <div class="form-group">
+        <label for="ofDireccion">Dirección</label>
+        <input type="text" name="direccion" id="ofDireccion" placeholder="Ej: Barrio La Reforma, Tegucigalpa" required>
+      </div>
+
+      <div class="form-group">
+        <label for="ofEstadoCivil">Estado Civil</label>
+        <select name="estado_civil" id="ofEstadoCivil" required>
+          <option value="soltero">Soltero</option>
+          <option value="casado">Casado</option>
+          <option value="divorciado">Divorciado</option>
+          <option value="viudo">Viudo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="ofDepartamento">Departamento Asignado </label>
+        <select name="departamento" id="ofDepartamento" required>
+          <option value="Rectoria">Rectoria</option>
+          <option value="contabilidad">Contabilidad</option>
+          <option value="recursos_humanos">Recursos Humanos</option>
+          <option value="comandancia">Comandancia</option>
+          <option value="logistica">Logística</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="ofGenero">Género</label>
+        <select name="genero" id="ofGenero" required>
+          <option value="masculino">Masculino</option>
+          <option value="femenino">Femenino</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+</div>
+
       <div class="form-grid">
         <div class="form-group">
           <label for="ofFoto">Fotografía</label>
           <input type="file" name="foto" id="ofFoto" accept="image/*">
           <small class="form-help">JPG / PNG / GIF</small>
-        </div>
+</div>
 
-        <div class="form-group">
-          <label for="ofDocumento">Curriculum Vitae (PDF)</label>
-          <input type="file" name="documento" id="ofDocumento" accept=".pdf">
-          <small class="form-help">Hoja de vida, certificados, etc.</small>
-        </div>
-
-        
+      <div class="form-group">
+        <label for="ofDocumento">Hoja de Servicio (PDF)</label>
+        <input type="file" name="documento" id="ofDocumento" accept=".pdf">
+        <small class="form-help">Hoja de Servicio</small>
+      </div>
+</div>
+        <div class="form-grid">
+          <div class="form-group">
+       <label for="ofEstado">Estado del Oficial</label>
+        <select name="estado" id="ofEstado" required>
+          <option value="activo">Activo</option>
+          <option value="traslado">En traslado</option>
+          <option value="permiso">En permiso</option>
+          <option value="faltista">Faltista</option>
+          <option value="retirado">Retirado</option>
+        </select>
 
       </div>
+    
+      
 
       <div class="form-buttons">
         <button type="submit" class="btn btn-primario">Guardar</button>
@@ -191,12 +253,14 @@ $oficiales = $stmt->fetchAll();
 
       <div class="perfil-footer">
         <div class="document-links" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
-          <!-- CV -->
+          <!-- HV -->
           <?php if (!empty($o['documento'])): ?>
-            <a href="<?= htmlspecialchars($o['documento']) ?>" target="_blank" class="btn btn-outline btn-documento" aria-label="Ver CV de <?= htmlspecialchars($o['nombre']) ?>">
-              Ver CV
+            <a href="<?= htmlspecialchars($o['documento']) ?>" target="_blank" class="btn btn-outline btn-documento" aria-label="Ver HV de <?= htmlspecialchars($o['nombre']) ?>">
+              Ver HV
             </a>
           <?php endif; ?>
+
+
 
         <div class="accion-grupo">
           <button
@@ -206,7 +270,18 @@ $oficiales = $stmt->fetchAll();
               "nombre" => $o["nombre"],
               "rango" => $o["rango"],
               "anio" => $o["años_asignado"],
-              "notas" => $o["notas"]
+              "notas" => $o["notas"],
+              "foto" => $o["foto"],
+              "documento" => $o["documento"],
+              "estado" => $o["estado"],
+              "numero_identificacion" => $o["numero_identificacion"],
+              "fecha_nacimiento" => $o["fecha_nacimiento"],
+              "numero_telefono" => $o["numero_telefono"],
+              "direccion" => $o["direccion"],
+              "estado_civil" => $o["estado_civil"],
+              "departamento" => $o["departamento"],
+              "genero" => $o["genero"]
+
             ]) ?>)'
             class="btn btn-primario btn-pequeno"
             aria-label="Editar <?= htmlspecialchars($o['nombre']) ?>"
@@ -290,3 +365,4 @@ function imprimirDocumento(url) {
   setTimeout(() => { try { w.print(); } catch(e){} }, 900);
 }
 </script>
+

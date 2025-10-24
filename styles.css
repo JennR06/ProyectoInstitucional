@@ -155,9 +155,9 @@ body {
 .btn-signin:hover { transform: translateY(-2px); background: #d85f11; }
 
 /* Error (mantener visible si hay mensaje) */
-.login-box .error { color: #ffb3b3; min-height: 1.2em; margin-top: 0.5rem; }
 
-/* Responsive: apilar en pantallas pequeñas */
+
+/* Responsive: apilar en pantallas pequeñas  */
 @media (max-width: 900px) {
   .login-container { flex-direction: column; }
   .login-left { order: 2; padding: 2rem; text-align: center; }
@@ -667,39 +667,43 @@ body {
 /* Modal overlay para formularios */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: none; /* la lógica JS puede usar style.display = 'block' */
 }
 
+/* Cuando el modal se muestre (JS usa style.display = 'block') */
+.modal-overlay[aria-hidden="false"],
+.modal-overlay[style*="display: block"] {
+  display: block;
+}
+
+/* centrar el contenido del modal independientemente del display del overlay */
 .modal-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: slideInUp 0.3s;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 920px;        /* adapta según prefieras */
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  padding: 1.2rem 1.4rem;
 }
 
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* versión amplia si usas modal-form-amplio */
+.modal-form.modal-form-amplio {
+  max-width: 1100px;
+}
+
+/* evitar que el contenido de fondo se pueda desplazar cuando el modal esté abierto (opcional) */
+.modal-overlay[aria-hidden="false"] ~ body,
+.modal-overlay[style*="display: block"] ~ body {
+  overflow: hidden;
 }
 
 /* Estilos para el encabezado del formulario modal */
@@ -1156,149 +1160,6 @@ body {
   }
 }
 
-
-/* Estilos para los filtros */
-.filtros-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.filtros-container {
-  display: flex;
-  gap: 1rem;
-  align-items: end;
-}
-
-.filtros-form {
-  display: flex;
-  gap: 1rem;
-  align-items: end;
-  flex-wrap: wrap;
-}
-
-.filtro-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filtro-group label {
-  font-weight: 600;
-  color: #333;
-  font-size: 0.9rem;
-}
-
-.filtro-group select {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background: white;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.filtro-group select:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.btn-limpiar {
-  padding: 0.5rem 1rem;
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s;
-}
-
-.btn-limpiar:hover {
-  background: #5a6268;
-}
-
-.filtros-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.filtros-container {
-  display: flex;
-  gap: 1rem;
-  align-items: end;
-}
-
-.filtros-form {
-  display: flex;
-  gap: 1rem;
-  align-items: end;
-  flex-wrap: wrap;
-}
-
-.filtro-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filtro-group label {
-  font-weight: 600;
-  color: #333;
-  font-size: 0.9rem;
-}
-
-.filtro-group select {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background: white;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.filtro-group select:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.btn-limpiar {
-  padding: 0.5rem 1rem;
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s;
-}
-
-.btn-limpiar:hover {
-  background: #5a6268;
-}
-
-/* Estilos para estados de carga y error */
-.loading, .error {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  background: #f8f9fa;
-  border-radius: 8px;
-  font-style: italic;
-}
-
-.error {
-  color: #dc3545;
-  background: #f8d7da;
-}
-
 /* Estilos para los filtros */
 .filtros-header {
   display: flex;
@@ -1368,14 +1229,8 @@ body {
   text-align: center;
   padding: 2rem;
   color: #666;
-  background: #f8f9fa;
   border-radius: 8px;
   font-style: italic;
-}
-
-.error {
-  color: #dc3545;
-  background: #f8d7da;
 }
 
 /* Estilos mejorados para la lista de veteranos */

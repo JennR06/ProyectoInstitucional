@@ -65,7 +65,7 @@ try {
   }
   
 } catch (PDOException $e) {
-  error_log("Error en la consulta: " . $e->getMessage());
+  error_log("Error en obtener_veteranos: " . $e->getMessage());
   $veteranos = [];
 }
 ?>

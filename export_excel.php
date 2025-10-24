@@ -87,7 +87,7 @@ if (!$texto_filtro) {
 }
 
 echo '<table border="1">';
-echo '<tr><th colspan="6" style="background:#333; color:white; font-size:16px;">Reporte de Personal</th></tr>';
+echo '<tr><th colspan="6" style="background:#333; color:white; font-size:16px;">Reporte de Personal con Más Antigüedad</th></tr>';
 echo '<tr><td colspan="6"><strong>Sistema INTEGRA</strong> - Reporte generado el: ' . date('d/m/Y H:i:s') . '</td></tr>';
 echo '<tr><td colspan="6"><strong>Filtros aplicados:</strong> ' . $texto_filtro . '</td></tr>';
 echo '<tr><td colspan="6"><strong>Total de resultados:</strong> ' . count($veteranos) . '</td></tr>';

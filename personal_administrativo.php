@@ -199,7 +199,7 @@ $personal = $stmt->fetchAll();
       <?php if ($p['documento']): ?>
         <div class="perfil-documento">
           <a href="<?= htmlspecialchars($p['documento']) ?>" target="_blank" class="btn-documento" aria-label="Ver CV de <?= htmlspecialchars($p['nombre']) ?>">
-            Ver CV
+            Ver Perfil
           </a>
         </div>
       <?php endif; ?>

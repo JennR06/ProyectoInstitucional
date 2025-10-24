@@ -50,7 +50,7 @@ function mostrarBienvenida() {
 
   contenido.innerHTML = `
     <div class="bienvenida">
-      <h2>🎖️ ${saludo}</h2>
+      <h2>${saludo}</h2>
       <p class="intro">
         Este sistema ha sido diseñado para fortalecer la gestión del personal del <strong>Liceo Militar de Honduras</strong>, 
         promoviendo la excelencia, la disciplina y el compromiso institucional.
@@ -63,7 +63,6 @@ function mostrarBienvenida() {
         <ul>
         <li> -  Consultar historial del personal</li>
         <li> -  Visualizar reportes</li>
-        <li> -  Recibir notificaciones importantes</li>
       </ul>
       </div>
     </div>
@@ -151,6 +150,12 @@ window.mostrarFormOficial = function() {
     document.getElementById('ofRango').value = '';
     document.getElementById('ofAniosAsignado').value = '';
     document.getElementById('ofNotas').value = '';
+    document.getElementById('ofNumeroIdentificacion').value = '';
+    document.getElementById('ofFechaNacimiento').value = '';
+    document.getElementById('ofNumeroTelefono').value = '';
+    document.getElementById('ofDireccion').value = '';
+    document.getElementById('ofEstadoCivil').value = '';
+    document.getElementById('ofDepartamento').value = '';
     document.getElementById('ofFoto').value = '';
     document.getElementById('ofDocumento').value = '';
   }
@@ -171,6 +176,14 @@ window.editarOficial = function(datos) {
     document.getElementById('ofNombre').value = datos.nombre;
     document.getElementById('ofRango').value = datos.rango;
     document.getElementById('ofAniosAsignado').value = datos.anio;
+    document.getElementById('ofNumeroIdentificacion').value = datos.numero_identificacion || '';
+    document.getElementById('ofFechaNacimiento').value = datos.fecha_nacimiento || '';
+    document.getElementById('ofNumeroTelefono').value = datos.numero_telefono || '';
+    document.getElementById('ofDireccion').value = datos.direccion || '';
+    document.getElementById('ofEstadoCivil').value = datos.estado_civil || '';
+    document.getElementById('ofDepartamento').value = datos.departamento || '';
+    document.getElementById('ofFoto').value = datos.foto || '';
+    document.getElementById('ofDocumento').value = datos.documento || '';
     document.getElementById('ofNotas').value = datos.notas || '';
   }
 }
@@ -841,3 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
         aplicarFiltros();
     }
 });
+
+
+
+
