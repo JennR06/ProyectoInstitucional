@@ -1,5 +1,5 @@
 <?php
-require 'bd.php';
+require 'db.php';
 
 // Obtener parámetros de filtro
 $filtro_tipo = $_GET['tipo'] ?? 'todos';

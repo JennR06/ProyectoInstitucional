@@ -1,25 +1,23 @@
 // Referencias a elementos del DOM
-const loginSection   = document.getElementById("login");
-const dashboard      = document.getElementById("dashboard");
-const usuarioInput   = document.getElementById("usuario");
-const claveInput     = document.getElementById("clave");
-const errorMsg       = document.getElementById("error");
-const contenido      = document.getElementById("contenido");
+const loginSection = document.getElementById("login");
+const dashboard = document.getElementById("dashboard");
+const usuarioInput = document.getElementById("usuario");
+const claveInput = document.getElementById("clave");
+const errorMsg = document.getElementById("error");
+const contenido = document.getElementById("contenido");
 
 // Usuarios y contraseñas válidos
 const usuariosVal = {
   rectoria: "1234",
-  talento:  "abcd",
-  admin:    "rinrom",
+  talento: "abcd",
+  admin: "rinrom",
 };
-
 let usuarioActivo = '';
 
 // Validar credenciales y mostrar dashboard
 function validarLogin() {
   const user = usuarioInput.value.trim();
   const pass = claveInput.value.trim();
-
   if (usuariosVal[user] === pass) {
     usuarioActivo = user;
     errorMsg.innerText = "";
@@ -44,10 +42,7 @@ function cerrarSesion() {
 
 // Mostrar pantalla de bienvenida
 function mostrarBienvenida() {
-  const saludo = usuarioActivo === "director"
-    ? "Bienvenido al Sistema INTEGRA"
-    : "Bienvenido al Sistema INTEGRA";
-
+  const saludo = "Bienvenido al Sistema INTEGRA";
   contenido.innerHTML = `
     <div class="bienvenida">
       <h2>${saludo}</h2>
@@ -61,9 +56,9 @@ function mostrarBienvenida() {
       <div class="info-box">
         <p><strong>¿Qué puedes hacer aquí?</strong></p>
         <ul>
-        <li> -  Consultar historial del personal</li>
-        <li> -  Visualizar reportes</li>
-      </ul>
+          <li> - Consultar historial del personal</li>
+          <li> - Visualizar reportes</li>
+        </ul>
       </div>
     </div>
   `;
@@ -76,7 +71,7 @@ function mostrarBienvenida() {
   });
 });
 
-// Mostrar la sección de navbar
+// Mostrar la sección correspondiente
 function mostrar(seccion) {
   if (seccion === "oficiales") {
     fetch('historial_oficiales.php')
@@ -138,238 +133,270 @@ function mostrar(seccion) {
 }
 
 // ========================================
-// FUNCIONES PARA OFICIALES (ACTUALIZADO)
+// FUNCIONES PARA OFICIALES
 // ========================================
+// === FUNCIONES PARA OFICIALES ===
 
-window.mostrarFormOficial = function() {
-  const modal = document.getElementById('formDivOficial');
-  if (!modal) return;
-  // guardar elemento que tenía foco para restaurarlo luego
-  window.__lastFocused = document.activeElement;
-
-  // mostrar modal y marcar accesibilidad
-  modal.style.display = 'flex';
-  modal.removeAttribute('aria-hidden');
-
-  const dialog = modal.querySelector('.modal-form') || modal;
-  if (dialog) {
-    dialog.setAttribute('tabindex', '-1');
-    // mover foco al primer control o al dialog si no hay controles
-    const focusables = getFocusableElements(dialog);
-    const first = focusables.length ? focusables[0] : dialog;
-    first.focus();
-  }
-
-  // instalar focus-trap
-  const container = dialog || modal;
-  window.__focusTrapHandler = function(e) {
-    if (e.key !== 'Tab') return;
-    const focusables = getFocusableElements(container);
-    if (!focusables.length) {
-      e.preventDefault();
-      return;
-    }
-    const firstEl = focusables[0];
-    const lastEl = focusables[focusables.length - 1];
-    if (e.shiftKey) {
-      if (document.activeElement === firstEl) {
-        e.preventDefault();
-        lastEl.focus();
-      }
-    } else {
-      if (document.activeElement === lastEl) {
-        e.preventDefault();
-        firstEl.focus();
-      }
-    }
-  };
-  document.addEventListener('keydown', window.__focusTrapHandler);
-};
-
-window.cerrarFormOficial = function() {
-  const modal = document.getElementById('formDivOficial');
-  if (!modal) return;
-
-  // quitar listener de focus-trap
-  if (window.__focusTrapHandler) {
-    document.removeEventListener('keydown', window.__focusTrapHandler);
-    window.__focusTrapHandler = null;
-  }
-
-  // ocultar modal y actualizar accesibilidad
-  // antes de esconder, mover foco fuera del modal (a opener si existe)
-  const last = window.__lastFocused;
-  try {
-    if (last && typeof last.focus === 'function') last.focus();
-  } catch (e) { /* ignore */ }
-
-  // forzar blur dentro del modal para evitar warning aria-hidden sobre elemento con foco
-  const activeInside = modal.contains(document.activeElement) ? document.activeElement : null;
-  if (activeInside && typeof activeInside.blur === 'function') activeInside.blur();
-
-  modal.setAttribute('aria-hidden', 'true');
-  modal.style.display = 'none';
-  window.__lastFocused = null;
-};
-
-window.editarOficial = function(datos) {
+function mostrarFormOficial() {
   const modal = document.getElementById('formDivOficial');
   if (modal) {
     modal.style.display = 'flex';
-    document.getElementById('ofId').value = datos.id;
-    document.getElementById('ofNombre').value = datos.nombre;
-    document.getElementById('ofRango').value = datos.rango;
-    document.getElementById('ofAniosAsignado').value = datos.anio;
-    document.getElementById('ofNumeroIdentificacion').value = datos.numero_identificacion || '';
-    document.getElementById('ofFechaNacimiento').value = datos.fecha_nacimiento || '';
-    document.getElementById('ofNumeroTelefono').value = datos.numero_telefono || '';
-    document.getElementById('ofDireccion').value = datos.direccion || '';
-    document.getElementById('ofEstadoCivil').value = datos.estado_civil || '';
-    document.getElementById('ofDepartamento').value = datos.departamento || '';
-    document.getElementById('ofFoto').value = datos.foto || '';
-    document.getElementById('ofDocumento').value = datos.documento || '';
-    document.getElementById('ofNotas').value = datos.notas || '';
+    const form = document.getElementById('oficialForm');
+    if (form) form.reset();
+    document.getElementById('ofId').value = '';
+    // Reiniciar campos condicionales
+    document.getElementById('ofCampoAlergias').style.display = 'none';
+    document.getElementById('ofCampoAccidente').style.display = 'none';
   }
 }
 
-window.eliminarOficial = function(id) {
-  if (!confirm('¿Está seguro de eliminar este oficial?\n\nEsto también eliminará sus archivos asociados.')) return;
-  
-  const datos = new FormData();
-  datos.append('delete', id);
-  
-  fetch('historial_oficiales.php', {
-    method: 'POST',
-    body: datos
-  })
-  .then(res => res.text())
-  .then(resp => {
-    alert('✅ Oficial eliminado correctamente');
-    recargarOficiales();
-  })
-  .catch(err => {
-    console.error('Error:', err);
-    alert('❌ Error al eliminar');
-  });
+function cerrarFormOficial() {
+  const modal = document.getElementById('formDivOficial');
+  if (modal) modal.style.display = 'none';
 }
 
-window.recargarOficiales = function() {
-  fetch('historial_oficiales.php')
-    .then(res => res.text())
-    .then(html => {
-      contenido.innerHTML = html;
-      contenido.classList.remove("fade-in");
-      void contenido.offsetWidth;
-      contenido.classList.add("fade-in");
-      inicializarEventosOficiales();
+function editarOficial(data) {
+  const modal = document.getElementById('formDivOficial');
+  if (!modal) return;
+
+  modal.style.display = 'flex';
+
+  // Campos generales
+  const fields = [
+    'id', 'nombre', 'rango', 'anio', 'notas', 'numero_identificacion',
+    'fecha_nacimiento', 'numero_telefono', 'direccion', 'estado_civil',
+    'departamento', 'genero', 'alergias', 'enfermedades_cronicas',
+    'tipo_sangre', 'ultima_evaluacion', 'accidentes_laborales'
+  ];
+
+  fields.forEach(field => {
+    const el = document.getElementById('of' + field.charAt(0).toUpperCase() + field.slice(1));
+    if (el) el.value = data[field] || '';
+  });
+
+  // Checkbox EPP
+  const eppCheckbox = document.getElementById('ofUsaEPP');
+  if (eppCheckbox) eppCheckbox.checked = data.usa_epp == 1;
+
+  // Checkbox Alergias (condicional)
+  const alergiasCheck = document.getElementById('ofTieneAlergias');
+  if (alergiasCheck) {
+    const tieneAlergias = !!data.alergias; // true si hay valor
+    alergiasCheck.checked = tieneAlergias;
+    document.getElementById('ofCampoAlergias').style.display = tieneAlergias ? 'block' : 'none';
+  }
+
+  // Checkbox Accidentes (condicional)
+  const accidenteCheck = document.getElementById('ofTieneAccidente');
+  if (accidenteCheck) {
+    const tieneAccidente = !!data.accidentes_laborales;
+    accidenteCheck.checked = tieneAccidente;
+    document.getElementById('ofCampoAccidente').style.display = tieneAccidente ? 'block' : 'none';
+    
+    // Si hay accidente, intentar cargar la fecha desde un campo separado (opcional)
+    // Si no tienes `fecha_accidente` en tu DB, puedes omitir esto
+    if (tieneAccidente && data.fecha_accidente) {
+      document.getElementById('ofFechaAccidente').value = data.fecha_accidente;
+    }
+  }
+
+  // Estado
+  const estadoSelect = document.getElementById('ofEstado');
+  if (estadoSelect) estadoSelect.value = data.estado || 'activo';
+}
+
+// === Eventos para campos médicos condicionales ===
+function inicializarEventosMedicosOficiales() {
+  const alergiasCheck = document.getElementById('ofTieneAlergias');
+  const accidenteCheck = document.getElementById('ofTieneAccidente');
+
+  if (alergiasCheck) {
+    alergiasCheck.addEventListener('change', () => {
+      const campo = document.getElementById('ofCampoAlergias');
+      if (campo) {
+        campo.style.display = alergiasCheck.checked ? 'block' : 'none';
+        if (!alergiasCheck.checked) {
+          document.getElementById('ofAlergias').value = '';
+        }
+      }
     });
+  }
+
+  if (accidenteCheck) {
+    accidenteCheck.addEventListener('change', () => {
+      const campo = document.getElementById('ofCampoAccidente');
+      if (campo) {
+        campo.style.display = accidenteCheck.checked ? 'block' : 'none';
+        if (!accidenteCheck.checked) {
+          document.getElementById('ofFechaAccidente').value = '';
+          document.getElementById('ofAccidentes').value = '';
+        }
+      }
+    });
+  }
+}
+
+// Inicializar eventos médicos al cargar la página (si el formulario ya está presente)
+document.addEventListener('DOMContentLoaded', () => {
+  inicializarEventosMedicosOficiales();
+});
+
+// También inicializar si el contenido se carga dinámicamente (vía fetch)
+function inicializarEventosOficiales() {
+  inicializarEventosMedicosOficiales();
+}
+
+  // Checkbox EPP
+  const eppCheckbox = document.getElementById('ofUsaEPP');
+  if (eppCheckbox) eppCheckbox.checked = data.usa_epp || false;
+
+  // Estado
+  document.getElementById('ofEstado').value = data.estado || 'activo';
+
+  mostrarFormOficial();
+
+function eliminarOficial(id) {
+  if (!confirm('¿Eliminar oficial? Esta acción no se puede deshacer.')) return;
+  fetch('', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'delete=' + id
+  }).then(() => location.reload());
 }
 
 function inicializarEventosOficiales() {
-  const form = document.getElementById('oficialForm');
-  if (form) {
-    form.onsubmit = null;
-    
-    form.onsubmit = function(e) {
-      e.preventDefault();
-      
-      console.log('Formulario de oficial enviado');
-      
-      const datos = new FormData(form);
-      datos.append('ajax', '1');
-      
-      fetch('historial_oficiales.php', {
-        method: 'POST',
-        body: datos
-      })
+  document.getElementById('oficialForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append('ajax', '1');
+    fetch('', { method: 'POST', body: formData })
       .then(res => res.text())
-      .then(resp => {
-        console.log('Respuesta del servidor:', resp);
-        if (resp.trim() === 'OK') {
-          alert('✅ Oficial guardado correctamente');
+      .then(txt => {
+        if (txt === 'OK') {
           cerrarFormOficial();
-          recargarOficiales();
+          location.reload();
         } else {
-          alert('⚠️ Error: ' + resp);
+          alert('Error: ' + txt);
         }
-      })
-      .catch(err => {
-        console.error('Error en fetch:', err);
-        alert('❌ Error de conexión');
       });
-      
-      return false;
-    };
+  });
+
+  // Filtro por estado (si existe el contenedor)
+  const lista = document.getElementById('listaOficiales');
+  const resultContainer = document.getElementById('statusResult');
+  if (lista && resultContainer) {
+    let statusFilter = '';
+    function aplicarFiltro() {
+      const tarjetas = Array.from(lista.querySelectorAll('.perfil-card'));
+      const matched = tarjetas.filter(card => {
+        const status = (card.dataset.status || 'activo').toLowerCase();
+        return !statusFilter || status === statusFilter;
+      });
+      tarjetas.forEach(card => card.style.display = matched.includes(card) ? 'block' : 'none');
+      resultContainer.textContent = statusFilter 
+        ? `Mostrando oficiales en estado "${statusFilter}" (${matched.length})`
+        : `Total de oficiales: ${matched.length}`;
+    }
+    aplicarFiltro();
   }
 }
 
-// foco/modal management helpers
-window.__lastFocused = null;
-window.__focusTrapHandler = null;
-
-function getFocusableElements(container) {
-  if (!container) return [];
-  return Array.from(container.querySelectorAll(
-    'a[href], area[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex]:not([tabindex="-1"]), [contenteditable]'
-  )).filter(el => el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+// ========================================
+// FUNCIONES PARA MANTENIMIENTO
+// ========================================
+function inicializarEventosMedicos() {
+  const alergias = document.getElementById('pmTieneAlergias');
+  const epp = document.getElementById('pmUsaEPP');
+  const accidente = document.getElementById('pmTieneAccidente');
+  if (alergias) {
+    alergias.addEventListener('change', () => {
+      const campo = document.getElementById('pmCampoAlergias');
+      if (campo) campo.style.display = alergias.checked ? 'block' : 'none';
+    });
+  }
+  if (epp) {
+    epp.addEventListener('change', () => {
+      const campo = document.getElementById('pmCampoEPP');
+      if (campo) campo.style.display = epp.checked ? 'block' : 'none';
+    });
+  }
+  if (accidente) {
+    accidente.addEventListener('change', () => {
+      const campo = document.getElementById('pmCampoAccidente');
+      if (campo) campo.style.display = accidente.checked ? 'block' : 'none';
+    });
+  }
 }
-
-// ========================================
-// FUNCIONES PARA MANTENIMIENTO (ACTUALIZADO)
-// ========================================
 
 window.mostrarFormMantenimiento = function() {
   const modal = document.getElementById('formDivMantenimiento');
   if (modal) {
     modal.style.display = 'flex';
+    const form = document.getElementById('mantenimientoForm');
+    if (form) form.reset();
     document.getElementById('pmId').value = '';
-    document.getElementById('pmNombre').value = '';
-    document.getElementById('pmCargo').value = '';
-    document.getElementById('pmAnioIngreso').value = '';
-    document.getElementById('pmNotas').value = '';
-    document.getElementById('pmFoto').value = '';
-    document.getElementById('pmDocumento').value = '';
+    setTimeout(inicializarEventosMedicos, 100);
   }
 }
 
 window.cerrarFormMantenimiento = function() {
   const modal = document.getElementById('formDivMantenimiento');
-  if (modal) {
-    modal.style.display = 'none';
-  }
+  if (modal) modal.style.display = 'none';
 }
 
 window.editarMantenimiento = function(datos) {
   const modal = document.getElementById('formDivMantenimiento');
   if (modal) {
     modal.style.display = 'flex';
-    document.getElementById('pmId').value = datos.id;
-    document.getElementById('pmNombre').value = datos.nombre;
-    document.getElementById('pmCargo').value = datos.cargo;
-    document.getElementById('pmAnioIngreso').value = datos.anio;
-    document.getElementById('pmNotas').value = datos.notas || '';
+    const campos = ['id','nombre','cargo','anio','notas','estado_laboral','area_asignada','supervisor','turno','horario','telefono','correo'];
+    campos.forEach(campo => {
+      const el = document.getElementById('pm'+campo.charAt(0).toUpperCase() + campo.slice(1));
+      if (el) el.value = datos[campo] || '';
+    });
+    const medicos = [
+      {key: 'estado_salud', id: 'pmEstadoSalud'},
+      {key: 'detalle_alergias', id: 'pmDetalleAlergias'},
+      {key: 'tipo_epp', id: 'pmTipoEPP'},
+      {key: 'ultima_evaluacion', id: 'pmUltimaEvaluacion'},
+      {key: 'proxima_evaluacion', id: 'pmProximaEvaluacion'},
+      {key: 'fecha_accidente', id: 'pmFechaAccidente'},
+      {key: 'detalle_accidente', id: 'pmDetalleAccidente'}
+    ];
+    medicos.forEach(m => {
+      const el = document.getElementById(m.id);
+      if (el) el.value = datos[m.key] || '';
+    });
+    const checkboxes = [
+      {key: 'tiene_alergias', id: 'pmTieneAlergias'},
+      {key: 'usa_epp', id: 'pmUsaEPP'},
+      {key: 'tiene_accidente', id: 'pmTieneAccidente'}
+    ];
+    checkboxes.forEach(cb => {
+      const el = document.getElementById(cb.id);
+      if (el) el.checked = datos[cb.key] == 1;
+    });
+    setTimeout(() => {
+      inicializarEventosMedicos();
+      if (document.getElementById('pmTieneAlergias')?.checked) document.getElementById('pmCampoAlergias').style.display = 'block';
+      if (document.getElementById('pmUsaEPP')?.checked) document.getElementById('pmCampoEPP').style.display = 'block';
+      if (document.getElementById('pmTieneAccidente')?.checked) document.getElementById('pmCampoAccidente').style.display = 'block';
+    }, 100);
   }
 }
 
 window.eliminarMantenimiento = function(id) {
-  if (!confirm('¿Está seguro de eliminar este personal?\n\nEsto también eliminará sus archivos asociados.')) return;
-  
+  if (!confirm('¿Está seguro de eliminar este personal?\nEsto también eliminará sus archivos asociados.')) return;
   const datos = new FormData();
   datos.append('delete', id);
-  
-  fetch('personal_mantenimiento.php', {
-    method: 'POST',
-    body: datos
-  })
-  .then(res => res.text())
-  .then(resp => {
-    alert('✅ Personal eliminado correctamente');
-    recargarMantenimiento();
-  })
-  .catch(err => {
-    console.error('Error:', err);
-    alert('❌ Error al eliminar');
-  });
+  fetch('personal_mantenimiento.php', { method: 'POST', body: datos })
+    .then(() => {
+      alert('✅ Personal eliminado correctamente');
+      recargarMantenimiento();
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      alert('❌ Error al eliminar');
+    });
 }
 
 window.recargarMantenimiento = function() {
@@ -387,57 +414,39 @@ window.recargarMantenimiento = function() {
 function inicializarEventosMantenimiento() {
   const form = document.getElementById('mantenimientoForm');
   if (form) {
-    form.onsubmit = null;
-    
     form.onsubmit = function(e) {
       e.preventDefault();
-      
-      console.log('Formulario de mantenimiento enviado');
-      
       const datos = new FormData(form);
       datos.append('ajax', '1');
-      
-      fetch('personal_mantenimiento.php', {
-        method: 'POST',
-        body: datos
-      })
-      .then(res => res.text())
-      .then(resp => {
-        console.log('Respuesta del servidor:', resp);
-        
-        if (resp.trim() === 'OK') {
-          alert('✅ Personal guardado correctamente');
-          cerrarFormMantenimiento();
-          recargarMantenimiento();
-        } else {
-          alert('⚠️ Error: ' + resp);
-        }
-      })
-      .catch(err => {
-        console.error('Error en fetch:', err);
-        alert('❌ Error de conexión');
-      });
-      
-      return false;
+      fetch('personal_mantenimiento.php', { method: 'POST', body: datos })
+        .then(res => res.text())
+        .then(resp => {
+          if (resp.trim() === 'OK') {
+            alert('✅ Personal guardado correctamente');
+            cerrarFormMantenimiento();
+            recargarMantenimiento();
+          } else {
+            alert('⚠️ Error: ' + resp);
+          }
+        })
+        .catch(err => {
+          console.error('Error en fetch:', err);
+          alert('❌ Error de conexión');
+        });
     };
   }
+  inicializarEventosMedicos();
 }
 
 // ========================================
 // FUNCIONES PARA DOCENTES
 // ========================================
-
 window.mostrarFormDocente = function() {
   const modal = document.getElementById('formDivDocente');
   if (modal) {
     modal.style.display = 'flex';
-    document.getElementById('docId').value = '';
-    document.getElementById('docNombre').value = '';
-    document.getElementById('docEspecialidad').value = '';
-    document.getElementById('docAnioIngreso').value = '';
-    document.getElementById('docNotas').value = '';
-    document.getElementById('docNivelEducativo').value = '';
-    document.getElementById('docHorario').value = '';
+    ['docId','docNombre','docEspecialidad','docAnioIngreso','docNotas','docNivelEducativo','docHorario']
+      .forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
     document.getElementById('docFoto').value = '';
     document.getElementById('docDocumento').value = '';
   }
@@ -445,44 +454,32 @@ window.mostrarFormDocente = function() {
 
 window.cerrarFormDocente = function() {
   const modal = document.getElementById('formDivDocente');
-  if (modal) {
-    modal.style.display = 'none';
-  }
+  if (modal) modal.style.display = 'none';
 }
 
 window.editarDocente = function(datos) {
   const modal = document.getElementById('formDivDocente');
   if (modal) {
     modal.style.display = 'flex';
-    document.getElementById('docId').value = datos.id;
-    document.getElementById('docNombre').value = datos.nombre;
-    document.getElementById('docEspecialidad').value = datos.especialidad;
-    document.getElementById('docAnioIngreso').value = datos.anio;
-    document.getElementById('docNotas').value = datos.notas || '';
-    document.getElementById('docNivelEducativo').value = datos.nivel_educativo || '';
-    document.getElementById('docHorario').value = datos.horario || '';
+    ['id','nombre','especialidad','anio','notas','nivel_educativo','horario']
+      .forEach(f => {
+        const el = document.getElementById('doc'+f.charAt(0).toUpperCase() + f.slice(1));
+        if (el) el.value = datos[f] || '';
+      });
   }
 }
 
 window.eliminarDocente = function(id) {
-  if (!confirm('¿Está seguro de eliminar este docente?\n\nEsto también eliminará sus archivos asociados.')) return;
-  
-  const datos = new FormData();
-  datos.append('delete', id);
-  
-  fetch('docentes.php', {
-    method: 'POST',
-    body: datos
-  })
-  .then(res => res.text())
-  .then(resp => {
-    alert('✅ Docente eliminado correctamente');
-    recargarDocentes();
-  })
-  .catch(err => {
-    console.error('Error:', err);
-    alert('❌ Error al eliminar');
-  });
+  if (!confirm('¿Está seguro de eliminar este docente?\nEsto también eliminará sus archivos asociados.')) return;
+  fetch('docentes.php', { method: 'POST', body: new FormData().append('delete', id) })
+    .then(() => {
+      alert('✅ Docente eliminado correctamente');
+      recargarDocentes();
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      alert('❌ Error al eliminar');
+    });
 }
 
 window.recargarDocentes = function() {
@@ -500,38 +497,25 @@ window.recargarDocentes = function() {
 function inicializarEventosDocentes() {
   const form = document.getElementById('docenteForm');
   if (form) {
-    form.onsubmit = null;
-    
     form.onsubmit = function(e) {
       e.preventDefault();
-      
-      console.log('Formulario de docente enviado');
-      
       const datos = new FormData(form);
       datos.append('ajax', '1');
-      
-      fetch('docentes.php', {
-        method: 'POST',
-        body: datos
-      })
-      .then(res => res.text())
-      .then(resp => {
-        console.log('Respuesta del servidor:', resp);
-        
-        if (resp.trim() === 'OK') {
-          alert('✅ Docente guardado correctamente');
-          cerrarFormDocente();
-          recargarDocentes();
-        } else {
-          alert('⚠️ Error: ' + resp);
-        }
-      })
-      .catch(err => {
-        console.error('Error en fetch:', err);
-        alert('❌ Error de conexión');
-      });
-      
-      return false;
+      fetch('docentes.php', { method: 'POST', body: datos })
+        .then(res => res.text())
+        .then(resp => {
+          if (resp.trim() === 'OK') {
+            alert('✅ Docente guardado correctamente');
+            cerrarFormDocente();
+            recargarDocentes();
+          } else {
+            alert('⚠️ Error: ' + resp);
+          }
+        })
+        .catch(err => {
+          console.error('Error en fetch:', err);
+          alert('❌ Error de conexión');
+        });
     };
   }
 }
@@ -539,16 +523,12 @@ function inicializarEventosDocentes() {
 // ========================================
 // FUNCIONES PARA ADMINISTRATIVO
 // ========================================
-
 window.mostrarFormAdministrativo = function() {
   const modal = document.getElementById('formDivAdministrativo');
   if (modal) {
     modal.style.display = 'flex';
-    document.getElementById('pmId').value = '';
-    document.getElementById('pmNombre').value = '';
-    document.getElementById('pmCargo').value = '';
-    document.getElementById('pmAnioIngreso').value = '';
-    document.getElementById('pmNotas').value = '';
+    ['pmId','pmNombre','pmCargo','pmAnioIngreso','pmNotas']
+      .forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
     document.getElementById('pmFoto').value = '';
     document.getElementById('pmDocumento').value = '';
   }
@@ -556,42 +536,32 @@ window.mostrarFormAdministrativo = function() {
 
 window.cerrarFormAdministrativo = function() {
   const modal = document.getElementById('formDivAdministrativo');
-  if (modal) {
-    modal.style.display = 'none';
-  }
+  if (modal) modal.style.display = 'none';
 }
 
 window.editarAdministrativo = function(datos) {
   const modal = document.getElementById('formDivAdministrativo');
   if (modal) {
     modal.style.display = 'flex';
-    document.getElementById('pmId').value = datos.id;
-    document.getElementById('pmNombre').value = datos.nombre;
-    document.getElementById('pmCargo').value = datos.cargo;
-    document.getElementById('pmAnioIngreso').value = datos.anio;
-    document.getElementById('pmNotas').value = datos.notas || '';
+    ['id','nombre','cargo','anio','notas']
+      .forEach(f => {
+        const el = document.getElementById('pm'+f.charAt(0).toUpperCase() + f.slice(1));
+        if (el) el.value = datos[f] || '';
+      });
   }
 }
 
 window.eliminarAdministrativo = function(id) {
-  if (!confirm('¿Está seguro de eliminar este personal?\n\nEsto también eliminará sus archivos asociados.')) return;
-  
-  const datos = new FormData();
-  datos.append('delete', id);
-
-  fetch('personal_administrativo.php', {
-    method: 'POST',
-    body: datos
-  })
-  .then(res => res.text())
-  .then(resp => {
-    alert('✅ Personal eliminado correctamente');
-    recargarAdministrativo();
-  })
-  .catch(err => {
-    console.error('Error:', err);
-    alert('❌ Error al eliminar');
-  });
+  if (!confirm('¿Está seguro de eliminar este personal?\nEsto también eliminará sus archivos asociados.')) return;
+  fetch('personal_administrativo.php', { method: 'POST', body: new FormData().append('delete', id) })
+    .then(() => {
+      alert('✅ Personal eliminado correctamente');
+      recargarAdministrativo();
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      alert('❌ Error al eliminar');
+    });
 }
 
 window.recargarAdministrativo = function() {
@@ -609,252 +579,51 @@ window.recargarAdministrativo = function() {
 function inicializarEventosAdministrativo() {
   const form = document.getElementById('administrativoForm');
   if (form) {
-    form.onsubmit = null;
-    
     form.onsubmit = function(e) {
       e.preventDefault();
-
-      console.log('Formulario de Administrativo enviado');
-
       const datos = new FormData(form);
       datos.append('ajax', '1');
-      
-      fetch('personal_administrativo.php', {
-        method: 'POST',
-        body: datos
-      })
-      .then(res => res.text())
-      .then(resp => {
-        console.log('Respuesta del servidor:', resp);
-        
-        if (resp.trim() === 'OK') {
-          alert('✅ Personal guardado correctamente');
-          cerrarFormAdministrativo();
-          recargarAdministrativo();
-        } else {
-          alert('⚠️ Error: ' + resp);
-        }
-      })
-      .catch(err => {
-        console.error('Error en fetch:', err);
-        alert('❌ Error de conexión');
-      });
-      
-      return false;
+      fetch('personal_administrativo.php', { method: 'POST', body: datos })
+        .then(res => res.text())
+        .then(resp => {
+          if (resp.trim() === 'OK') {
+            alert('✅ Personal guardado correctamente');
+            cerrarFormAdministrativo();
+            recargarAdministrativo();
+          } else {
+            alert('⚠️ Error: ' + resp);
+          }
+        })
+        .catch(err => {
+          console.error('Error en fetch:', err);
+          alert('❌ Error de conexión');
+        });
     };
   }
 }
 
-
 // ========================================
-// FUNCIONES PARA REPORTES
+// FUNCIONES GENERALES
 // ========================================
-function inicializarEventosReportes() {
-  const form = document.getElementById('formReporte');
-  if (form) {
-    form.onsubmit = function(e) {
-      e.preventDefault();
-      const datos = new FormData(form);
-
-      fetch('reportes.php', {
-        method: 'POST',
-        body: datos
-      })
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('contenido').innerHTML = html;
-        inicializarEventosReportes(); // Reasigna eventos tras recarga
-      })
-      .catch(err => {
-        console.error('Error en reporte:', err);
-        alert('❌ Error al generar el reporte');
-      });
-    };
-  }
-}
-function recargarReportes() {
-  fetch('reportes.php')
-    .then(res => res.text())
-    .then(html => {
-      contenido.innerHTML = html; 
-      contenido.classList.remove("fade-in");
-      void contenido.offsetWidth;
-      contenido.classList.add("fade-in");
-      inicializarEventosReportes();
-    }); 
-}
-
-// Opción A — redirigir / recargar la página principal
-// Reemplazamos por comportamiento SPA: mostrar la bienvenida sin recargar
 window.Inicio = function() {
-  // Asegurar que el dashboard esté visible
   if (loginSection) loginSection.style.display = 'none';
   if (dashboard) {
     dashboard.style.display = 'block';
     dashboard.classList.add('active');
   }
-
-  // Mostrar contenido de bienvenida y animar
   mostrarBienvenida();
-
   if (contenido) {
     contenido.classList.remove('fade-in');
-    void contenido.offsetWidth; // reflow para reiniciar animación
+    void contenido.offsetWidth;
     contenido.classList.add('fade-in');
     contenido.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
 
-
 function imprimirDocumento(url) {
   if (!url) return alert('Documento no disponible');
-  // usar el endpoint intermedio que muestra el PDF y lanza print()
   const win = window.open('print.php?f=' + encodeURIComponent(url), '_blank');
   if (!win) {
     alert('Ventanas emergentes bloqueadas. Permite popups para imprimir.');
   }
 }
-
-
-// En tu archivo JavaScript o dentro de <script> tags en dashboard.php
-function exportToPDF() {
-    // Mostrar loading
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando...';
-    btn.disabled = true;
-    
-    // Abrir en nueva pestaña o descargar
-    window.open('export_pdf.php', '_blank');
-    
-    // Restaurar botón después de 2 segundos
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }, 2000);
-}
-
-function exportToExcel() {
-    // Mostrar loading
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando...';
-    btn.disabled = true;
-    
-    // Forzar descarga
-    const link = document.createElement('a');
-    link.href = 'export_excel.php';
-    link.download = 'reporte_dashboard_' + new Date().toISOString().split('T')[0] + '.xls';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Restaurar botón después de 2 segundos
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }, 2000);
-}
-
-// Variable global para almacenar los filtros actuales
-let filtrosActuales = {
-    tipo: '<?= $filtro_tipo ?>',
-    genero: '<?= $filtro_genero ?>'
-};
-
-function aplicarFiltros() {
-    // Mostrar loading
-    const contenedor = document.getElementById('resultados-veteranos');
-    contenedor.innerHTML = '<div class="loading">Cargando...</div>';
-    
-    // Obtener valores actuales
-    const tipo = document.getElementById('tipo').value;
-    const genero = document.getElementById('genero').value;
-    
-    // Actualizar filtros globales
-    filtrosActuales.tipo = tipo;
-    filtrosActuales.genero = genero;
-    
-    // Realizar petición AJAX
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `obtener_veteranos.php?tipo=${tipo}&genero=${genero}`, true);
-    
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            contenedor.innerHTML = xhr.responseText;
-        } else {
-            contenedor.innerHTML = '<div class="error">Error al cargar los datos</div>';
-        }
-    };
-    
-    xhr.onerror = function() {
-        contenedor.innerHTML = '<div class="error">Error de conexión</div>';
-    };
-    
-    xhr.send();
-}
-
-function limpiarFiltros() {
-    document.getElementById('tipo').value = 'todos';
-    document.getElementById('genero').value = 'todos';
-    aplicarFiltros();
-}
-
-// Funciones de exportación que usan los filtros actuales
-function exportToPDF() {
-    const { tipo, genero } = filtrosActuales;
-    
-    // Mostrar loading en el botón
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando...';
-    btn.disabled = true;
-    
-    // Abrir exportación con filtros
-    window.open(`export_pdf.php?tipo=${tipo}&genero=${genero}`, '_blank');
-    
-    // Restaurar botón después de 2 segundos
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }, 2000);
-}
-
-function exportToExcel() {
-    const { tipo, genero } = filtrosActuales;
-    
-    // Mostrar loading en el botón
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando...';
-    btn.disabled = true;
-    
-    // Forzar descarga con filtros
-    const link = document.createElement('a');
-    link.href = `export_excel.php?tipo=${tipo}&genero=${genero}`;
-    link.download = `reporte_personal_${new Date().toISOString().split('T')[0]}.xls`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Restaurar botón después de 2 segundos
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }, 2000);
-}
-
-// Aplicar filtros al cargar la página si hay parámetros en URL
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tipo = urlParams.get('tipo');
-    const genero = urlParams.get('genero');
-    
-    if (tipo || genero) {
-        if (tipo) document.getElementById('tipo').value = tipo;
-        if (genero) document.getElementById('genero').value = genero;
-        aplicarFiltros();
-    }
-});
-
-

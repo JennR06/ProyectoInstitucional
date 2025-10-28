@@ -470,7 +470,303 @@ body {
         margin-left: 200px;
     } }
 
+/* ===== OFICIALES - ESTILOS ESPECÍFICOS ===== */
+.titulo-con-boton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #e0e0e0;
+}
 
+.titulo-centrado {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #1a365d;
+  font-weight: 700;
+}
+
+.btn-nuevo-oficial {
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+}
+
+/* === LISTA DE OFICIALES (TARJETAS) === */
+.perfil-lista.moderna {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.perfil-card-expandido {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid #eee;
+}
+
+.perfil-card-expandido:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.perfil-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.2rem 1.2rem 0.8rem;
+}
+
+.perfil-foto {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+
+.perfil-meta {
+  flex: 1;
+}
+
+.perfil-meta h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.25rem;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.chip {
+  display: inline-block;
+  background: #ebf8ff;
+  color: #3182ce;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.meta-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.perfil-notas {
+  padding: 0 1.2rem 0.8rem;
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  border-top: 1px dashed #edf2f7;
+  margin-top: 0.6rem;
+}
+
+.perfil-footer {
+  padding: 0.8rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.document-links {
+  flex-wrap: wrap;
+}
+
+.accion-grupo {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+/* === MODAL DE FORMULARIO === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-form-amplio {
+  background: white;
+  border-radius: 14px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.8rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-form h3 {
+  margin-top: 0;
+  margin-bottom: 1.4rem;
+  color: #2c5282;
+  font-size: 1.4rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-help {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid #edf2f7;
+}
+
+/* === BOTONES === */
+.btn {
+  padding: 0.55rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-primario {
+  background: #3182ce;
+  color: white;
+}
+
+.btn-primario:hover {
+  background: #2c5282;
+}
+
+.btn-secundario {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.btn-secundario:hover {
+  background: #cbd5e0;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #3182ce;
+  color: #3182ce;
+}
+
+.btn-outline:hover {
+  background: #ebf8ff;
+}
+
+.btn-pequeno {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+/* === ESTADOS (OPCIONAL) === */
+.perfil-card[data-status="activo"] .chip {
+  background: #c6f6d5;
+  color: #2f855a;
+}
+.perfil-card[data-status="permiso"] .chip {
+  background: #fed7d7;
+  color: #c53030;
+}
+.perfil-card[data-status="traslado"] .chip {
+  background: #feebc8;
+  color: #975a16;
+}
+.perfil-card[data-status="faltista"] .chip {
+  background: #fed7d7;
+  color: #c53030;
+}
+.perfil-card[data-status="retirado"] .chip {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .titulo-con-boton {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls-der {
+    display: flex;
+    justify-content: center;
+  }
+
+  .modal-form-amplio {
+    padding: 1.2rem;
+    margin: 0.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accion-grupo {
+    justify-content: center;
+  }
+}
 
 /*------------------------------------*/
 /* Bloques de perfil tipo tarjeta */
@@ -535,7 +831,7 @@ body {
 /* ===FORMULARIO AMPLIADO=== */
 
 .modal-form-amplio {
-  max-width: 700px;
+  max-width: 750px;
 }
 
 .form-grid {
@@ -564,7 +860,7 @@ body {
 }
 
 /* Responsive para formulario ampliado */
-@media (max-width: 768px) {
+@media (max-width: 750px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -697,7 +993,7 @@ body {
 
 /* versión amplia si usas modal-form-amplio */
 .modal-form.modal-form-amplio {
-  max-width: 1100px;
+  max-width: 600px;
 }
 
 /* evitar que el contenido de fondo se pueda desplazar cuando el modal esté abierto (opcional) */
@@ -773,6 +1069,27 @@ body {
   }
 }
 
+.perfil-contenido {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+.perfil-foto-modal {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+.perfil-datos p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+.perfil-datos h4 {
+  margin-top: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
 /* === MODAL OVERLAY MEJORADO === */
 .modal-overlay {
   position: fixed;
@@ -1363,4 +1680,3 @@ body {
     margin-left: 30px;
   }
 }
-

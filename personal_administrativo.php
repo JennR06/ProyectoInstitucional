@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require 'bd.php';
+require 'db.php';
 
 // 1) Crear o actualizar (solo si POST AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {

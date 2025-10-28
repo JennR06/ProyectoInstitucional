@@ -1,5 +1,5 @@
 <?php
-require 'bd.php';
+require 'db.php';
 
 // Subir documento
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['subir_documento'])) {

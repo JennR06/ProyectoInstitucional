@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTEGRA</title>
-  <!-- Hoja de estilos principal -->
   <link rel="stylesheet" href="styles.css">
-
-  <!-- Script con defer para que se ejecute tras cargar el DOM -->
   <script src="script.js" defer></script>
 </head> 
 <body>
@@ -15,24 +12,26 @@
   <!-- LOGIN -->
   <section id="login" class="login-page">
     <div class="login-container">
-      <div class="login-right">
+      <div class="login-left">
         <h1>BIENVENIDOS AL SISTEMA INTEGRA</h1>
-  
       </div>
 
       <div class="login-right">
-        <div class="login-box">
+        <div class="login-box" onsubmit="event.preventDefault(); validarLogin();">
           <img src="img/LMH_LOGO.png" alt="Liceo Militar" class="logo">
           <h2>Iniciar Sesión</h2>
 
-          <input type="text" id="usuario" placeholder="Email Address">
-          <input type="password" id="clave" placeholder="Password">
+          <label for="usuario">Usuario</label>
+          <input type="text" id="usuario" name="usuario" placeholder="Ej: talento" required>
+
+          <label for="clave">Contraseña</label>
+          <input type="password" id="clave" name="clave" placeholder="••••••••" required>
 
           <label class="recuerdame">
-            <input type="checkbox" id="remember"> Recuerdame
+            <input type="checkbox" id="remember"> Recuérdame
           </label>
 
-          <button type="button" onclick="validarLogin()" class="btn btn-signin">Iniciar Sesión</button>
+          <button type="submit" class="btn btn-signin">Iniciar Sesión</button>
 
           <p id="error" class="error"></p>
           <a href="#" class="olvide">¿Olvidaste tu contraseña?</a>
@@ -41,13 +40,18 @@
     </div>
   </section>
 
-  <!-- DASHBOARD (oculto hasta login exitoso) -->
-  <section id="dashboard">
-    <!-- Barra superior -->
+  <!-- DASHBOARD -->
+  <section id="dashboard" style="display:none;">
+    <!-- Opcional: barra superior -->
     <div class="navbar">
+      <div class="navbar-left">
+        <h1>Sistema INTEGRA</h1>
+      </div>
+      <div class="navbar-right">
+        <span>Bienvenido, <strong id="nombreUsuario">—</strong></span>
+      </div>
     </div>
 
-    <!-- Menú lateral mejorado -->
     <aside class="sidebar" aria-label="Menú principal">
       <div class="sidebar-top">
         <img src="img/LMH_LOGO.png" alt="Logo" class="sidebar-logo">
@@ -56,7 +60,6 @@
 
       <ul class="nav-list">
         <li><button class="nav-btn" type="button" onclick="Inicio()">
-          <!-- Inicio SVG -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5z" fill="currentColor"/>
           </svg>
@@ -97,7 +100,7 @@
           </svg>
           <span>Reportes</span>
         </button></li>
-
+      </ul>
 
       <div class="sidebar-footer">
         <button class="nav-btn danger" type="button" onclick="cerrarSesion()">
@@ -109,30 +112,10 @@
       </div>
     </aside>
 
-    <!-- Contenedor dinámico -->
-   <main class="content" id="contenido">
-    <div class="bienvenida">
-    <h2> Bienvenidos al Sistema INTEGRA</h2>
-    
-    <p class="intro">
-      Este sistema ha sido diseñado para fortalecer la gestión del personal del <strong>Liceo Militar de Honduras</strong>, 
-      promoviendo la excelencia, la disciplina y el compromiso institucional.
-    </p>
-
-    <blockquote class="frase-motivacional">
-      “La disciplina forma líderes, el talento los perfecciona.”
-    </blockquote>
-
-    <div class="info-box">
-      <p><strong>¿Qué puedes hacer aquí?</strong></p>
-      <ul>
-        <li> - Consultar historial del personal</li>
-        <li> -  Visualizar reportes</li>
-      </ul>
-    </div>
-
-</main>
-
+    <main class="content" id="contenido">
+      <!-- Contenido dinámico aquí -->
+    </main>
+  </section>
 
 </body>
 </html>

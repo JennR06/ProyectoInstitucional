@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require 'bd.php';
+require 'db.php';
 
 // 1) Crear o actualizar (solo si POST AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
   $notas           = trim($_POST['notas']);
   $nivel_educativo = trim($_POST['nivel_educativo']);
   $horario         = trim($_POST['horario']);
+  $genero         = trim($_POST['genero']); 
 
   // Manejo de imagen de perfil
   $foto = null;

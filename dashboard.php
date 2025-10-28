@@ -1,5 +1,5 @@
 <?php
-require 'bd.php';
+require 'db.php';
 
 // Contar personal
 try {
